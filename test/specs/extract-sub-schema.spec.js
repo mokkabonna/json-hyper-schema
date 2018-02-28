@@ -4,112 +4,154 @@ const expect = chai.expect
 
 describe.only('extract sub schema', function() {
 
-  describe('plain schema', function() {
-    var schema
-    beforeEach(function() {
-      schema = {
-        properties: {
-          name: {
-            minLength: 2
-          }
+  var schema
+  beforeEach(function() {
+    schema = {
+      properties: {
+        name: {
+          minLength: 2
         }
       }
-    })
+    }
+  })
 
+  describe('plain schema', function() {
     it('return a new schema the one sub schema', function() {
       var result = extract(schema, '/properties/name')
-      expect(result).to.eql({
-        minLength: 2
-      })
+      expect(result).to.eql({minLength: 2})
     })
+  })
 
-    it('extracts allOf', function() {
+  describe('not keyword', function() {
+    it('extracts the not schema', function() {
       var result = extract({
         properties: schema.properties,
-        allOf: [{
+        not: {
           properties: {
             name: {
               maxLength: 5
             }
           }
-        }]
+        }
       }, '/properties/name')
       expect(result).to.eql({
         minLength: 2,
-        allOf: [{
+        not: {
           maxLength: 5
-        }]
+        }
+      })
+    })
+  })
+
+  describe('schemas in arrays', function() {
+    it('extracts allOf', function() {
+      var result = extract({
+        properties: schema.properties,
+        allOf: [
+          {
+            properties: {
+              name: {
+                maxLength: 5
+              }
+            }
+          }
+        ]
+      }, '/properties/name')
+      expect(result).to.eql({
+        minLength: 2,
+        allOf: [
+          {
+            maxLength: 5
+          }
+        ]
       })
     })
 
     it('extracts anyOf', function() {
       var result = extract({
         properties: schema.properties,
-        anyOf: [{
-          properties: {
-            name: {
-              maxLength: 5
+        anyOf: [
+          {
+            properties: {
+              name: {
+                maxLength: 5
+              }
             }
           }
-        }]
+        ]
       }, '/properties/name')
       expect(result).to.eql({
         minLength: 2,
-        anyOf: [{
-          maxLength: 5
-        }]
+        anyOf: [
+          {
+            maxLength: 5
+          }
+        ]
       })
     })
 
     it('extracts oneOf', function() {
       var result = extract({
         properties: schema.properties,
-        oneOf: [{
-          properties: {
-            name: {
-              maxLength: 5
+        oneOf: [
+          {
+            properties: {
+              name: {
+                maxLength: 5
+              }
             }
           }
-        }]
+        ]
       }, '/properties/name')
       expect(result).to.eql({
         minLength: 2,
-        oneOf: [{
-          maxLength: 5
-        }]
+        oneOf: [
+          {
+            maxLength: 5
+          }
+        ]
       })
     })
 
     it('extracts deeply nested ones', function() {
       var result = extract({
         properties: schema.properties,
-        allOf: [{
-          properties: {
-            name: {
-              maxLength: 5
-            }
-          },
-          allOf: [{
+        allOf: [
+          {
             properties: {
               name: {
-                pattern: '.+'
+                maxLength: 5
               }
-            }
-          }, {
-            properties: {
-              foo: true
-            }
-          }]
-        }]
+            },
+            allOf: [
+              {
+                properties: {
+                  name: {
+                    pattern: '.+'
+                  }
+                }
+              }, {
+                properties: {
+                  foo: true
+                }
+              }
+            ]
+          }
+        ]
       }, '/properties/name')
+
       expect(result).to.eql({
         minLength: 2,
-        allOf: [{
-          maxLength: 5,
-          allOf: [{
-            pattern: '.+'
-          }]
-        }]
+        allOf: [
+          {
+            maxLength: 5,
+            allOf: [
+              {
+                pattern: '.+'
+              }
+            ]
+          }
+        ]
       })
     })
   })

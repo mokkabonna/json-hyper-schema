@@ -20,5 +20,9 @@ module.exports = function extractSchemas(schema, jsonPointer) {
     }
   })
 
+  if (schema.not) {
+    newSchema.not = extractSchemas(schema.not, jsonPointer)
+  }
+
   return newSchema
 }
