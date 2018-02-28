@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "json-pointer": "^0.6.0",
+    "lodash": "^4.17.5",
     "uri-templates": "^0.2.0"
   }
 }
