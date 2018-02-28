@@ -13,14 +13,14 @@ module.exports = function extractSchemas(schema, jsonPointer) {
   var schemaArrays = ['allOf', 'oneOf', 'anyOf']
 
   schemaArrays.forEach(function(name) {
-    if (schema[name]) {
+    if (schema.hasOwnProperty(name)) {
       newSchema[name] = schema[name].map(function(arraySchema) {
         return extractSchemas(arraySchema, jsonPointer)
       }).filter(isRestrictingSchema)
     }
   })
 
-  if (schema.not) {
+  if (schema.hasOwnProperty('not')) {
     newSchema.not = extractSchemas(schema.not, jsonPointer)
   }
 
