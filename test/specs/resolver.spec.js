@@ -36,11 +36,45 @@ describe('resolver', function() {
       expect(result).to.eql({})
     })
 
-    it('supports nested pointers', function() {
+    it('supports absoute templatePointers', function() {
       var result = resolver.getTemplateData('/products/{id}', {
         rel: 'self',
-        href: 'notImportant'
-      }, {id: 8})
+        href: 'notImportant',
+        templatePointers: {
+          id: '/child'
+        }
+      }, {id: 8, child: {id: 9}})
+      expect(result).to.eql({id: 9})
+    })
+
+    it('supports relative templatePointers', function() {
+      var result = resolver.getTemplateData('/products/{id}', {
+        rel: 'self',
+        href: 'notImportant',
+        templatePointers: {
+          id: '0/child'
+        }
+      }, {id: 8, child: {id: 9}})
+      expect(result).to.eql({id: 9})
+
+      var result = resolver.getTemplateData('/products/{id}', {
+        rel: 'self',
+        href: 'notImportant',
+        attachmentPointer: '/child/id',
+        templatePointers: {
+          id: '2/child'
+        }
+      }, {id: 8, child: {id: 9}})
+      expect(result).to.eql({id: 9})
+
+      var result = resolver.getTemplateData('/products/{id}', {
+        rel: 'self',
+        href: 'notImportant',
+        attachmentPointer: '/child/id',
+        templatePointers: {
+          id: '2'
+        }
+      }, {id: 8, child: {id: 9}})
       expect(result).to.eql({id: 8})
     })
   })
