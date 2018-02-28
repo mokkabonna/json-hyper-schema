@@ -43,6 +43,32 @@ describe.only('extract sub schema', function() {
     })
   })
 
+  describe('patternProperties', function() {
+    it('includes the schema if allOf if matching the property name', function() {
+      var result = extract({
+        properties: schema.properties,
+        patternProperties: {
+          'na.e': {
+            maxLength: 5
+          },
+          'n..e': {
+            pattern: '.+'
+          },
+          notMe: false
+        }
+      }, '/properties/name')
+
+      expect(result).to.eql({
+        minLength: 2,
+        allOf: [{
+          maxLength: 5
+        }, {
+          pattern: '.+'
+        }]
+      })
+    })
+  })
+
   describe('schemas in arrays', function() {
     it('extracts allOf', function() {
       var result = extract({
