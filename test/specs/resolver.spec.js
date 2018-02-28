@@ -41,7 +41,7 @@ describe('resolver', function() {
         rel: 'self',
         href: 'notImportant',
         templatePointers: {
-          id: '/child'
+          id: '/child/id'
         }
       }, {id: 8, child: {id: 9}})
       expect(result).to.eql({id: 9})
@@ -52,7 +52,7 @@ describe('resolver', function() {
         rel: 'self',
         href: 'notImportant',
         templatePointers: {
-          id: '0/child'
+          id: '0/child/id'
         }
       }, {id: 8, child: {id: 9}})
       expect(result).to.eql({id: 9})
@@ -62,7 +62,7 @@ describe('resolver', function() {
         href: 'notImportant',
         attachmentPointer: '/child/id',
         templatePointers: {
-          id: '2/child'
+          id: '2/child/id'
         }
       }, {id: 8, child: {id: 9}})
       expect(result).to.eql({id: 9})
@@ -72,7 +72,7 @@ describe('resolver', function() {
         href: 'notImportant',
         attachmentPointer: '/child/id',
         templatePointers: {
-          id: '2'
+          id: '2/id'
         }
       }, {id: 8, child: {id: 9}})
       expect(result).to.eql({id: 8})

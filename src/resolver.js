@@ -22,12 +22,10 @@ function getTemplateData(template, link, instance) {
     if (templatePointers.hasOwnProperty(name)) {
       valuePointer = templatePointers[name]
       if (isRelative(valuePointer)) {
-        valuePointer = valuePointer + '/' + name
         try {
           all[name] = util.resolve(instance, attachmentPointer, valuePointer)
         } catch (e) {}
       } else {
-        valuePointer = valuePointer + '/' + name
         attemptSet()
       }
     } else {
