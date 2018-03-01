@@ -1,6 +1,7 @@
 # json-hyper-schema [![Build Status](https://travis-ci.org/mokkabonna/json-hyper-schema.svg?branch=master)](https://travis-ci.org/mokkabonna/json-hyper-schema) [![Coverage Status](https://coveralls.io/repos/github/mokkabonna/json-hyper-schema/badge.svg?branch=master)](https://coveralls.io/github/mokkabonna/json-hyper-schema?branch=master)
 
-A javascript implementation of json hyper schema.
+
+> A javascript implementation of json hyper schema.
 
 The following utils are currently in this repository, but will probably become their own package:
 
