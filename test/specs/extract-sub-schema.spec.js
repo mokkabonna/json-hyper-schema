@@ -60,11 +60,13 @@ describe.only('extract sub schema', function() {
 
       expect(result).to.eql({
         minLength: 2,
-        allOf: [{
-          maxLength: 5
-        }, {
-          pattern: '.+'
-        }]
+        allOf: [
+          {
+            maxLength: 5
+          }, {
+            pattern: '.+'
+          }
+        ]
       })
     })
   })
@@ -86,9 +88,11 @@ describe.only('extract sub schema', function() {
 
       expect(result).to.eql({
         minLength: 2,
-        allOf: [{
-          maxLength: 5
-        }]
+        allOf: [
+          {
+            maxLength: 5
+          }
+        ]
       })
     })
 
@@ -107,11 +111,56 @@ describe.only('extract sub schema', function() {
       }, '/properties/foo')
 
       expect(result).to.eql({
-        allOf: [{
-          pattern: '.+'
-        }]
+        allOf: [
+          {
+            pattern: '.+'
+          }
+        ]
       })
     })
+
+    it('does include the schema if not matching properties or patternProperties', function() {
+      var result = extract({
+        properties: schema.properties,
+        patternProperties: {
+          'na.e': {
+            maxLength: 5
+          },
+          notMe: false
+        },
+        additionalProperties: false
+      }, '/properties/foo')
+
+      expect(result).to.eql({allOf: [false]})
+    })
+  })
+
+  describe('dependencies', function() {
+    it('considers ', function() {
+      var result = extract({
+        properties: schema.properties,
+        dependencies: {
+          other: {
+            properties: {
+              name: {
+                maxLength: 7
+              }
+            }
+          }
+        }
+      }, '/properties/name', {presentKeys: ['other']})
+
+      expect(result).to.eql({
+        minLength: 2,
+        allOf: [
+          {
+            maxLength: 7
+          }
+        ]
+      })
+    })
+
+    it('works with nested dependencies')
   })
 
   describe('schemas in arrays', function() {
