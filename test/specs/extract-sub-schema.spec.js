@@ -20,6 +20,32 @@ describe.only('extract sub schema', function() {
       var result = extract(schema, '/properties/name')
       expect(result).to.eql({minLength: 2})
     })
+
+    it('throws if not pointing to a subschema')
+  })
+
+  describe('non property pointer', function() {
+    it('extracts that schema', function() {
+      var result = extract({
+        properties: schema.properties,
+        additionalProperties: {
+          maxLength: 5,
+          allOf: [
+            {
+              pattern: '.+'
+            }
+          ]
+        }
+      }, '/additionalProperties')
+      expect(result).to.eql({
+        maxLength: 5,
+        allOf: [
+          {
+            pattern: '.+'
+          }
+        ]
+      })
+    })
   })
 
   describe('not keyword', function() {
