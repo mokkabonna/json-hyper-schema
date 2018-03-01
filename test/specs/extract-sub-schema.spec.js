@@ -69,6 +69,51 @@ describe.only('extract sub schema', function() {
     })
   })
 
+  describe('additionalProperties', function() {
+    it('does not include the schema if matching properties or patternProperties', function() {
+      var result = extract({
+        properties: schema.properties,
+        patternProperties: {
+          'na.e': {
+            maxLength: 5
+          },
+          notMe: false
+        },
+        additionalProperties: {
+          pattern: '.+'
+        }
+      }, '/properties/name')
+
+      expect(result).to.eql({
+        minLength: 2,
+        allOf: [{
+          maxLength: 5
+        }]
+      })
+    })
+
+    it('does include the schema if not matching properties or patternProperties', function() {
+      var result = extract({
+        properties: schema.properties,
+        patternProperties: {
+          'na.e': {
+            maxLength: 5
+          },
+          notMe: false
+        },
+        additionalProperties: {
+          pattern: '.+'
+        }
+      }, '/properties/foo')
+
+      expect(result).to.eql({
+        allOf: [{
+          pattern: '.+'
+        }]
+      })
+    })
+  })
+
   describe('schemas in arrays', function() {
     it('extracts allOf', function() {
       var result = extract({
