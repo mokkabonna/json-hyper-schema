@@ -14,7 +14,12 @@ module.exports = function extractSchemas(schema, jsonPointer, options) {
   var hasPatternProperty = false
 
   _.attempt(function() {
-    _.merge(newSchema, pointer.get(schema, jsonPointer))
+    var subSchema = pointer.get(schema, jsonPointer)
+    if (subSchema === false) {
+      newSchema = false
+    } else {
+      _.merge(newSchema, subSchema)
+    }
   })
 
   var hasPlainProperty = isNotEmptyObject(newSchema)

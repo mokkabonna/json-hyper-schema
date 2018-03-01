@@ -43,7 +43,12 @@ describe('resolver', function() {
         templatePointers: {
           id: '/child/id'
         }
-      }, {id: 8, child: {id: 9}})
+      }, {
+        id: 8,
+        child: {
+          id: 9
+        }
+      })
       expect(result).to.eql({id: 9})
     })
 
@@ -54,7 +59,12 @@ describe('resolver', function() {
         templatePointers: {
           id: '0/child/id'
         }
-      }, {id: 8, child: {id: 9}})
+      }, {
+        id: 8,
+        child: {
+          id: 9
+        }
+      })
       expect(result).to.eql({id: 9})
 
       result = resolver.getTemplateData('/products/{id}', {
@@ -64,7 +74,12 @@ describe('resolver', function() {
         templatePointers: {
           id: '2/child/id'
         }
-      }, {id: 8, child: {id: 9}})
+      }, {
+        id: 8,
+        child: {
+          id: 9
+        }
+      })
       expect(result).to.eql({id: 9})
 
       result = resolver.getTemplateData('/products/{id}', {
@@ -74,8 +89,92 @@ describe('resolver', function() {
         templatePointers: {
           id: '2/id'
         }
-      }, {id: 8, child: {id: 9}})
+      }, {
+        id: 8,
+        child: {
+          id: 9
+        }
+      })
       expect(result).to.eql({id: 8})
+    })
+  })
+
+  describe.only('getDefaultInputValues', function() {
+    it('gets an object with the default values set', function() {
+      var result = resolver.getDefaultInputValues('/products/{id}', {
+        rel: 'self',
+        href: 'notImportant',
+        hrefSchema: {
+          properties: {
+            id: {
+              type: 'integer',
+              minimum: 1
+            }
+          }
+        }
+      }, {id: 1})
+
+      expect(result).to.eql({id: 1})
+    })
+
+    it('does not include values if not valid (but sets undefined)', function() {
+      var result = resolver.getDefaultInputValues('/products/{id}', {
+        rel: 'self',
+        href: 'notImportant',
+        hrefSchema: {
+          properties: {
+            id: {
+              type: 'integer',
+              minimum: 1
+            }
+          }
+        }
+      }, {id: 0})
+
+      expect(result).to.eql({id: undefined})
+    })
+
+    it('excludes properties with with false set in subschema', function() {
+      var result = resolver.getDefaultInputValues('/products/{id}', {
+        rel: 'self',
+        href: '/products/{id}',
+        hrefSchema: {
+          properties: {
+            id: false
+          }
+        }
+      }, {id: 0})
+
+      expect(result).to.eql({})
+
+      result = resolver.getDefaultInputValues('/products/{id}', {
+        rel: 'self',
+        href: '/products/{id}',
+        hrefSchema: {
+          properties: {
+            id: true
+          },
+          allOf: [
+            {
+              properties: {
+                id: false
+              }
+            }
+          ]
+        }
+      }, {id: 0})
+
+      expect(result).to.eql({})
+    })
+
+    it('return empty object if no input allowed', function() {
+      var result = resolver.getDefaultInputValues('/products/{id}', {
+        rel: 'self',
+        href: '/products/{id}',
+        hrefSchema: false
+      }, {id: 0})
+
+      expect(result).to.eql({})
     })
   })
 
