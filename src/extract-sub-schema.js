@@ -60,7 +60,6 @@ module.exports = function extractSchemas(schema, jsonPointer, options) {
       return all
     }, [])
 
-
     newSchema.allOf = (newSchema.allOf || []).concat(dependencySchemas)
   }
 
