@@ -16,7 +16,7 @@ function resolve(data, base, relative) {
     if (tokens[0] === '') {
       throw new Error('Tring to get key of root. It does not have a key.')
     }
-    
+
     let propOrIndex = tokens.pop()
     let newPointer = pointer.compile(tokens)
     let parentValue = pointer.get(data, newPointer)

@@ -3,7 +3,6 @@ var util = require('./relative-json-pointer')
 var pointer = require('json-pointer')
 
 function resolve(template, link, instance) {
-  var defaultData = defaultTemplateData(template, link, instance)
 }
 
 function isRelative(jsonPointer) {

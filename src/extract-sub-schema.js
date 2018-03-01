@@ -10,7 +10,6 @@ module.exports = function extractSchemas(schema, jsonPointer, options) {
   options = options || {}
   var tokens = pointer.parse(jsonPointer)
   var lastToken = tokens[tokens.length - 1]
-  var secondToLast = tokens[tokens.length - 2]
   var newSchema = {}
   var hasPatternProperty = false
 

@@ -2,9 +2,9 @@ const chai = require('chai')
 const extract = require('../../src/extract-sub-schema')
 const expect = chai.expect
 
-describe.only('extract sub schema', function() {
-
+describe('extract sub schema', function() {
   var schema
+
   beforeEach(function() {
     schema = {
       properties: {

@@ -57,7 +57,7 @@ describe('resolver', function() {
       }, {id: 8, child: {id: 9}})
       expect(result).to.eql({id: 9})
 
-      var result = resolver.getTemplateData('/products/{id}', {
+      result = resolver.getTemplateData('/products/{id}', {
         rel: 'self',
         href: 'notImportant',
         attachmentPointer: '/child/id',
@@ -67,7 +67,7 @@ describe('resolver', function() {
       }, {id: 8, child: {id: 9}})
       expect(result).to.eql({id: 9})
 
-      var result = resolver.getTemplateData('/products/{id}', {
+      result = resolver.getTemplateData('/products/{id}', {
         rel: 'self',
         href: 'notImportant',
         attachmentPointer: '/child/id',
@@ -81,7 +81,6 @@ describe('resolver', function() {
 
   describe.skip('resolve', function() {
     it('resolves non templated uris', function() {
-
       var resolved = resolver.resolve(link.href, link, data)
 
       expect(resolved).to.eql('/resolved')
