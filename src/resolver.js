@@ -6,11 +6,9 @@ const Ajv = require('ajv')
 
 const ajv = new Ajv()
 
+const isRelative = jsonPointer => /^\d+/.test(jsonPointer)
+const isFalse = s => s === false
 function resolve(template, link, instance) {}
-
-function isRelative(jsonPointer) {
-  return /^\d+/.test(jsonPointer)
-}
 
 function getTemplateData(template, link, instance) {
   var parsedTemplate = uriTemplates(template)
@@ -47,24 +45,24 @@ function getTemplateData(template, link, instance) {
   return result
 }
 
-function anyIsFalse(schema) {
+function simplify(schema) {
   if (schema === false) {
-    return true
+    return false
   }
 
-  if (Array.isArray(schema.allOf) && schema.allOf.some(s => s === false)) {
-    return true
+  if (Array.isArray(schema.allOf) && schema.allOf.some(isFalse)) {
+    return false
   }
 
-  if (Array.isArray(schema.anyOf) && schema.anyOf.every(s => s === false)) {
-    return true
+  if (Array.isArray(schema.anyOf) && schema.anyOf.every(isFalse)) {
+    return false
   }
 
-  if (Array.isArray(schema.oneOf) && schema.oneOf.every(s => s === false)) {
-    return true
+  if (Array.isArray(schema.oneOf) && schema.oneOf.every(isFalse)) {
+    return false
   }
 
-  return false
+  return schema
 }
 
 function getDefaultInputValues(template, link, instance) {
@@ -78,7 +76,7 @@ function getDefaultInputValues(template, link, instance) {
   var defaultData = parsedTemplate.varNames.reduce(function(all, name) {
     var subSchema = extractSubSchema(link.hrefSchema, '/properties/' + name)
 
-    if (!anyIsFalse(subSchema)) {
+    if (simplify(subSchema) !== false) {
       all[name] = undefined
     }
 
