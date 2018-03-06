@@ -338,6 +338,9 @@ describe('resolver', function() {
       })
     })
 
+    it('provides a function for fully templating the template')
+    it('does not allow changing the hrefFixedInput')
+
     it('considers base')
   })
 })
