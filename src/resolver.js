@@ -2,13 +2,13 @@ const uriTemplates = require('uri-templates')
 const util = require('./relative-json-pointer')
 const extractSubSchema = require('./extract-sub-schema')
 const pointer = require('json-pointer')
+const URI = require('uri-js')
 const Ajv = require('ajv')
 
 const ajv = new Ajv()
 
 const isRelative = jsonPointer => /^\d+/.test(jsonPointer)
 const isFalse = s => s === false
-function resolve(template, link, instance) {}
 
 function getTemplateData(template, link, instance) {
   var parsedTemplate = uriTemplates(template)
@@ -88,6 +88,45 @@ function getDefaultInputValues(template, link, instance) {
   }, {})
 
   return defaultData
+}
+
+function resolveLink(ldo, instance, instanceUri) {
+  if (!ldo.hasOwnProperty('hrefSchema') || ldo.hrefSchema === false) {
+    var template = uriTemplates(ldo.href)
+    var uri
+
+    if (template.varNames.length) {
+      if (template.varNames.every(n => instance.hasOwnProperty(n))) {
+        uri = template.fill(instance)
+      }
+    } else {
+      uri = ldo.href
+    }
+
+    var resolved = {
+      contextUri: instanceUri,
+      contextPointer: '',
+      rel: ldo.rel,
+      attachmentPointer: ''
+    }
+
+    if (uri !== undefined) {
+      resolved.targetUri = URI.resolve(instanceUri, uri)
+    }
+
+    return resolved
+  } else {}
+}
+
+function resolve(schema, instance, instanceUri) {
+  if (!Array.isArray(schema.links)) return []
+
+  var links = schema.links.reduce(function(all, ldo) {
+    all.push(resolveLink(ldo, instance, instanceUri))
+    return all
+  }, [])
+
+  return links
 }
 
 module.exports = {

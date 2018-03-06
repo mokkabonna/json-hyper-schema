@@ -24,8 +24,12 @@ describe('resolver', function() {
       var result = resolver.getTemplateData('/products/{id%28}', {
         rel: 'self',
         href: 'notImportant'
-      }, {'id(': 7})
-      expect(result).to.eql({'id(': 7})
+      }, {
+        'id(': 7
+      })
+      expect(result).to.eql({
+        'id(': 7
+      })
     })
 
     it('returns empty if not existing in the template', function() {
@@ -49,7 +53,9 @@ describe('resolver', function() {
           id: 9
         }
       })
-      expect(result).to.eql({id: 9})
+      expect(result).to.eql({
+        id: 9
+      })
     })
 
     it('supports relative templatePointers', function() {
@@ -65,7 +71,9 @@ describe('resolver', function() {
           id: 9
         }
       })
-      expect(result).to.eql({id: 9})
+      expect(result).to.eql({
+        id: 9
+      })
 
       result = resolver.getTemplateData('/products/{id}', {
         rel: 'self',
@@ -80,7 +88,9 @@ describe('resolver', function() {
           id: 9
         }
       })
-      expect(result).to.eql({id: 9})
+      expect(result).to.eql({
+        id: 9
+      })
 
       result = resolver.getTemplateData('/products/{id}', {
         rel: 'self',
@@ -95,11 +105,13 @@ describe('resolver', function() {
           id: 9
         }
       })
-      expect(result).to.eql({id: 8})
+      expect(result).to.eql({
+        id: 8
+      })
     })
   })
 
-  describe.only('getDefaultInputValues', function() {
+  describe('getDefaultInputValues', function() {
     it('gets an object with the default values set', function() {
       var result = resolver.getDefaultInputValues('/products/{id}', {
         rel: 'self',
@@ -112,9 +124,13 @@ describe('resolver', function() {
             }
           }
         }
-      }, {id: 1})
+      }, {
+        id: 1
+      })
 
-      expect(result).to.eql({id: 1})
+      expect(result).to.eql({
+        id: 1
+      })
     })
 
     it('does not include values if not valid (but sets undefined)', function() {
@@ -129,9 +145,13 @@ describe('resolver', function() {
             }
           }
         }
-      }, {id: 0})
+      }, {
+        id: 0
+      })
 
-      expect(result).to.eql({id: undefined})
+      expect(result).to.eql({
+        id: undefined
+      })
     })
 
     it('excludes properties with with false set in subschema', function() {
@@ -143,7 +163,9 @@ describe('resolver', function() {
             id: false
           }
         }
-      }, {id: 0})
+      }, {
+        id: 0
+      })
 
       expect(result).to.eql({})
 
@@ -154,15 +176,15 @@ describe('resolver', function() {
           properties: {
             id: true
           },
-          allOf: [
-            {
-              properties: {
-                id: false
-              }
+          allOf: [{
+            properties: {
+              id: false
             }
-          ]
+          }]
         }
-      }, {id: 0})
+      }, {
+        id: 0
+      })
 
       expect(result).to.eql({})
     })
@@ -172,17 +194,83 @@ describe('resolver', function() {
         rel: 'self',
         href: '/products/{id}',
         hrefSchema: false
-      }, {id: 0})
+      }, {
+        id: 0
+      })
 
       expect(result).to.eql({})
     })
   })
 
-  describe.skip('resolve', function() {
-    it('resolves non templated uris', function() {
-      var resolved = resolver.resolve(link.href, link, data)
+  describe('resolve', function() {
+    var schema = {
+      $id: 'https://schema.example.com/entry',
+      $schema: 'http://json-schema.org/draft-07/hyper-schema#',
+      base: 'https://api.example.com/',
+      links: [{
+        rel: 'self',
+        href: ''
+      }, {
+        rel: 'about',
+        href: '/docs'
+      }]
+    }
 
-      expect(resolved).to.eql('/resolved')
+    it('resolves non templated uris', function() {
+      var resolved = resolver.resolve(schema, data, 'https://api.example.com')
+
+      expect(resolved).to.eql([{
+        contextUri: 'https://api.example.com',
+        contextPointer: '',
+        rel: 'self',
+        targetUri: 'https://api.example.com/',
+        attachmentPointer: ''
+      }, {
+        contextUri: 'https://api.example.com',
+        contextPointer: '',
+        rel: 'about',
+        targetUri: 'https://api.example.com/docs',
+        attachmentPointer: ''
+      }])
     })
+
+    it('resolves links with data from instance', function() {
+      var resolved = resolver.resolve({
+        links: [{
+          rel: 'author',
+          href: '/authors/{author}'
+        }]
+      }, {
+        author: 'Martin'
+      }, 'https://example.com')
+
+      expect(resolved).to.eql([{
+        contextUri: 'https://example.com',
+        contextPointer: '',
+        rel: 'author',
+        targetUri: 'https://example.com/authors/Martin',
+        attachmentPointer: ''
+      }])
+    })
+
+    it('does not set targetUri when it cannot be used', function() {
+      var resolved = resolver.resolve({
+        links: [{
+          rel: 'author',
+          href: '/authors/{author}/{extra}'
+        }]
+      }, {
+        author: 'Martin'
+      }, 'https://example.com')
+
+      expect(resolved).to.eql([{
+        contextUri: 'https://example.com',
+        contextPointer: '',
+        rel: 'author',
+        attachmentPointer: ''
+      }])
+    })
+
+    it('considers base')
   })
 })
