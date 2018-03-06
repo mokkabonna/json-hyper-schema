@@ -271,6 +271,73 @@ describe('resolver', function() {
       }])
     })
 
+    describe('requires input', function() {
+      it('resolves values that does not allow input', function() {
+        var resolved = resolver.resolve({
+          links: [{
+            rel: 'author',
+            href: '/authors/{author}/{extra}',
+            hrefSchema: {
+              properties: {
+                author: false,
+                extra: true
+              }
+            }
+          }]
+        }, {
+          author: 'Martin'
+        }, 'https://example.com')
+
+        expect(resolved).to.eql([{
+          contextUri: 'https://example.com',
+          contextPointer: '',
+          rel: 'author',
+          attachmentPointer: '',
+          hrefInputTemplates: [
+            '/authors/{author}/{extra}'
+          ],
+          hrefFixedInput: {
+            author: 'Martin'
+          },
+          hrefPrepopulatedInput: {
+            extra: undefined
+          }
+        }])
+      })
+
+      it('allows overriding prepopulated input', function() {
+        var resolved = resolver.resolve({
+          links: [{
+            rel: 'author',
+            href: '/authors/{author}/{extra}',
+            hrefSchema: {
+              properties: {
+                author: true,
+                extra: true
+              }
+            }
+          }]
+        }, {
+          author: 'Martin'
+        }, 'https://example.com')
+
+        expect(resolved).to.eql([{
+          contextUri: 'https://example.com',
+          contextPointer: '',
+          rel: 'author',
+          attachmentPointer: '',
+          hrefInputTemplates: [
+            '/authors/{author}/{extra}'
+          ],
+          hrefFixedInput: {},
+          hrefPrepopulatedInput: {
+            author: 'Martin',
+            extra: undefined
+          }
+        }])
+      })
+    })
+
     it('considers base')
   })
 })

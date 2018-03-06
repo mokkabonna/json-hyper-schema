@@ -4,6 +4,7 @@ const extractSubSchema = require('./extract-sub-schema')
 const pointer = require('json-pointer')
 const URI = require('uri-js')
 const Ajv = require('ajv')
+const omit = require('lodash/omit')
 
 const ajv = new Ajv()
 
@@ -91,9 +92,20 @@ function getDefaultInputValues(template, link, instance) {
 }
 
 function resolveLink(ldo, instance, instanceUri) {
-  if (!ldo.hasOwnProperty('hrefSchema') || ldo.hrefSchema === false) {
-    var template = uriTemplates(ldo.href)
-    var uri
+  let resolved = {
+    contextUri: instanceUri,
+    contextPointer: '',
+    rel: ldo.rel,
+    attachmentPointer: ''
+  }
+
+  if (ldo.hasOwnProperty('hrefSchema') && ldo.hrefSchema !== false) {
+    resolved.hrefInputTemplates = [ldo.href]
+    resolved.hrefPrepopulatedInput = getDefaultInputValues(ldo.href, ldo, instance)
+    resolved.hrefFixedInput = omit(getTemplateData(ldo.href, ldo, instance), Object.keys(resolved.hrefPrepopulatedInput))
+  } else {
+    let template = uriTemplates(ldo.href)
+    let uri
 
     if (template.varNames.length) {
       if (template.varNames.every(n => instance.hasOwnProperty(n))) {
@@ -103,19 +115,12 @@ function resolveLink(ldo, instance, instanceUri) {
       uri = ldo.href
     }
 
-    var resolved = {
-      contextUri: instanceUri,
-      contextPointer: '',
-      rel: ldo.rel,
-      attachmentPointer: ''
-    }
-
     if (uri !== undefined) {
       resolved.targetUri = URI.resolve(instanceUri, uri)
     }
+  }
 
-    return resolved
-  } else {}
+  return resolved
 }
 
 function resolve(schema, instance, instanceUri) {
