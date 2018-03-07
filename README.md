@@ -71,6 +71,20 @@ resolver
 
 ```
 
+
+## Roadmap
+
+- [x] Get template data from instance
+- [x] Get default values for user input
+- [x] Provide user input and template uri
+- [ ] Support base keyword
+- [ ] Support contextPointer
+- [x] Relative json pointer util
+- [x] Extract subschema util
+
+
+## Utils
+
 The following utils are currently in this repository, but will probably become their own package:
 
 - relative-json-pointer: resolve relative json pointers according to https://tools.ietf.org/html/draft-handrews-relative-json-pointer-01

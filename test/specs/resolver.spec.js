@@ -342,7 +342,26 @@ describe('resolver', function() {
         }])
       })
 
-      it('provides a function for fully templating the template and enforces prefilled values', function() {
+      it('provides a function for fully templating the template', function() {
+        var resolved = resolver.resolve({
+          links: [{
+            rel: 'author',
+            href: '/authors/{author}/{extra}',
+            hrefSchema: {
+              properties: {
+                author: true,
+                extra: true
+              }
+            }
+          }]
+        }, {
+          author: 'Martin'
+        }, 'https://example.com')
+
+        expect(resolved[0].fillHref).to.be.a('function')
+      })
+
+      it('does not allow input if schema is false', function() {
         var resolved = resolver.resolve({
           links: [{
             rel: 'author',
