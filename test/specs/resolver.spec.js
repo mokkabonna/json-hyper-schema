@@ -366,8 +366,6 @@ describe('resolver', function() {
       expect(targetUri).to.equal(resolved[0].targetUri)
     })
 
-    it('does not allow changing the hrefFixedInput')
-
     it('considers base')
   })
 })
