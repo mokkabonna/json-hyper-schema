@@ -217,62 +217,66 @@ describe('resolver', function() {
       }]
     }
 
-    it('resolves non templated uris', function() {
-      var resolved = resolver.resolve(schema, data, 'https://api.example.com')
+    describe('not accepting input', function() {
+      it('resolves non templated uris', function() {
+        var resolved = resolver.resolve(schema, data, 'https://api.example.com')
 
-      expect(resolved).to.eql([{
-        contextUri: 'https://api.example.com',
-        contextPointer: '',
-        rel: 'self',
-        targetUri: 'https://api.example.com/',
-        attachmentPointer: ''
-      }, {
-        contextUri: 'https://api.example.com',
-        contextPointer: '',
-        rel: 'about',
-        targetUri: 'https://api.example.com/docs',
-        attachmentPointer: ''
-      }])
-    })
+        expect(resolved).to.eql([{
+          contextUri: 'https://api.example.com',
+          contextPointer: '',
+          rel: 'self',
+          targetUri: 'https://api.example.com/',
+          attachmentPointer: ''
+        }, {
+          contextUri: 'https://api.example.com',
+          contextPointer: '',
+          rel: 'about',
+          targetUri: 'https://api.example.com/docs',
+          attachmentPointer: ''
+        }])
+      })
 
-    it('resolves links with data from instance', function() {
-      var resolved = resolver.resolve({
-        links: [{
+      it('resolves links with data from instance if not accepting input', function() {
+        var resolved = resolver.resolve({
+          links: [{
+            rel: 'author',
+            href: '/authors/{author}'
+          }]
+        }, {
+          author: 'Martin'
+        }, 'https://example.com')
+
+        expect(resolved).to.eql([{
+          contextUri: 'https://example.com',
+          contextPointer: '',
           rel: 'author',
-          href: '/authors/{author}'
-        }]
-      }, {
-        author: 'Martin'
-      }, 'https://example.com')
+          targetUri: 'https://example.com/authors/Martin',
+          attachmentPointer: ''
+        }])
+      })
 
-      expect(resolved).to.eql([{
-        contextUri: 'https://example.com',
-        contextPointer: '',
-        rel: 'author',
-        targetUri: 'https://example.com/authors/Martin',
-        attachmentPointer: ''
-      }])
-    })
+      it('does not set targetUri when it cannot be used', function() {
+        var resolved = resolver.resolve({
+          links: [{
+            rel: 'author',
+            href: '/authors/{author}/{extra}'
+          }]
+        }, {
+          author: 'Martin'
+        }, 'https://example.com')
 
-    it('does not set targetUri when it cannot be used', function() {
-      var resolved = resolver.resolve({
-        links: [{
+        expect(resolved).to.eql([{
+          contextUri: 'https://example.com',
+          contextPointer: '',
           rel: 'author',
-          href: '/authors/{author}/{extra}'
-        }]
-      }, {
-        author: 'Martin'
-      }, 'https://example.com')
+          attachmentPointer: ''
+        }])
+      })
 
-      expect(resolved).to.eql([{
-        contextUri: 'https://example.com',
-        contextPointer: '',
-        rel: 'author',
-        attachmentPointer: ''
-      }])
+      it('considers base')
     })
 
-    describe('requires input', function() {
+    describe('accepting input', function() {
       it('resolves values that does not allow input', function() {
         var resolved = resolver.resolve({
           links: [{
@@ -337,35 +341,33 @@ describe('resolver', function() {
           }
         }])
       })
-    })
 
-    it('provides a function for fully templating the template and enforces prefilled values', function() {
-      var resolved = resolver.resolve({
-        links: [{
-          rel: 'author',
-          href: '/authors/{author}/{extra}',
-          hrefSchema: {
-            properties: {
-              author: false,
-              extra: true
+      it('provides a function for fully templating the template and enforces prefilled values', function() {
+        var resolved = resolver.resolve({
+          links: [{
+            rel: 'author',
+            href: '/authors/{author}/{extra}',
+            hrefSchema: {
+              properties: {
+                author: false,
+                extra: true
+              }
             }
-          }
-        }]
-      }, {
-        author: 'Martin'
-      }, 'https://example.com')
+          }]
+        }, {
+          author: 'Martin'
+        }, 'https://example.com')
 
-      expect(resolved[0].fillHref).to.be.a('function')
+        expect(resolved[0].fillHref).to.be.a('function')
 
-      var targetUri = resolved[0].fillHref({
-        author: 'I should not be used',
-        extra: 'I should be used'
+        var targetUri = resolved[0].fillHref({
+          author: 'I should not be used',
+          extra: 'I should be used'
+        })
+
+        expect(targetUri).to.equal('/authors/Martin/' + encodeURIComponent('I should be used'))
+        expect(targetUri).to.equal(resolved[0].targetUri)
       })
-
-      expect(targetUri).to.equal('/authors/Martin/' + encodeURIComponent('I should be used'))
-      expect(targetUri).to.equal(resolved[0].targetUri)
     })
-
-    it('considers base')
   })
 })
