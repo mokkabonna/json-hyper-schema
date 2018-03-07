@@ -5,6 +5,7 @@ const pointer = require('json-pointer')
 const URI = require('uri-js')
 const Ajv = require('ajv')
 const omit = require('lodash/omit')
+const merge = require('lodash/merge')
 
 const ajv = new Ajv()
 
@@ -103,6 +104,13 @@ function resolveLink(ldo, instance, instanceUri) {
     resolved.hrefInputTemplates = [ldo.href]
     resolved.hrefPrepopulatedInput = getDefaultInputValues(ldo.href, ldo, instance)
     resolved.hrefFixedInput = omit(getTemplateData(ldo.href, ldo, instance), Object.keys(resolved.hrefPrepopulatedInput))
+    resolved.fillHref = function(userSupplied) {
+      var fixedData = omit(getTemplateData(ldo.href, ldo, instance), Object.keys(resolved.hrefPrepopulatedInput))
+      var allData = merge({}, userSupplied, fixedData)
+      var template = uriTemplates(ldo.href)
+      resolved.targetUri = template.fill(allData)
+      return resolved.targetUri
+    }
   } else {
     let template = uriTemplates(ldo.href)
     let uri

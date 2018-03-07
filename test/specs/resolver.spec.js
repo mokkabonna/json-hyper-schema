@@ -1,6 +1,7 @@
 const chai = require('chai')
 const resolver = require('../../src/resolver')
 const expect = chai.expect
+const _ = require('lodash')
 
 describe('resolver', function() {
   var link
@@ -288,7 +289,7 @@ describe('resolver', function() {
           author: 'Martin'
         }, 'https://example.com')
 
-        expect(resolved).to.eql([{
+        expect(resolved.map(o => _.omit(o, 'fillHref'))).to.eql([{
           contextUri: 'https://example.com',
           contextPointer: '',
           rel: 'author',
@@ -321,7 +322,7 @@ describe('resolver', function() {
           author: 'Martin'
         }, 'https://example.com')
 
-        expect(resolved).to.eql([{
+        expect(resolved.map(o => _.omit(o, 'fillHref'))).to.eql([{
           contextUri: 'https://example.com',
           contextPointer: '',
           rel: 'author',
@@ -338,7 +339,33 @@ describe('resolver', function() {
       })
     })
 
-    it('provides a function for fully templating the template')
+    it('provides a function for fully templating the template and enforces prefilled values', function() {
+      var resolved = resolver.resolve({
+        links: [{
+          rel: 'author',
+          href: '/authors/{author}/{extra}',
+          hrefSchema: {
+            properties: {
+              author: false,
+              extra: true
+            }
+          }
+        }]
+      }, {
+        author: 'Martin'
+      }, 'https://example.com')
+
+      expect(resolved[0].fillHref).to.be.a('function')
+
+      var targetUri = resolved[0].fillHref({
+        author: 'I should not be used',
+        extra: 'I should be used'
+      })
+
+      expect(targetUri).to.equal('/authors/Martin/' + encodeURIComponent('I should be used'))
+      expect(targetUri).to.equal(resolved[0].targetUri)
+    })
+
     it('does not allow changing the hrefFixedInput')
 
     it('considers base')
