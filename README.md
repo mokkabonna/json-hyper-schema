@@ -3,6 +3,8 @@
 
 > A javascript implementation of json hyper schema.
 
+This is currently under heavy development, expect the API to change.
+
 The following utils are currently in this repository, but will probably become their own package:
 
 - relative-json-pointer: resolve relative json pointers according to https://tools.ietf.org/html/draft-handrews-relative-json-pointer-01
