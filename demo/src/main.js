@@ -3,8 +3,12 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import AsyncMethods from 'vue-async-methods'
 
 Vue.config.productionTip = false
+Vue.use(AsyncMethods, {
+  createComputed: true
+})
 
 /* eslint-disable no-new */
 new Vue({

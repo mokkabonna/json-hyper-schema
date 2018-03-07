@@ -1,0 +1,9 @@
+{
+  "links": [{
+    "rel": "self",
+    "href": ""
+  }, {
+    "rel": "tag:rel.example.com,2017:things",
+    "href": "/api/things"
+  }]
+}

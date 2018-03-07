@@ -13,7 +13,7 @@ export default new Router({
       component: Dashboard
     },
     {
-      path: '/',
+      path: '/browser',
       name: 'Demo1',
       component: Demo1
     }
