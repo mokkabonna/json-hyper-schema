@@ -10,7 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
 const api = require('../server')
-const HOST = process.env.HOST
+const HOST = process.env.HOST || process.env.IP
 const PORT = process.env.PORT && Number(process.env.PORT)
 
 api.listen(3001)
@@ -40,6 +40,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       ? { warnings: false, errors: true }
       : false,
     publicPath: config.dev.assetsPublicPath,
+    disableHostCheck: true,
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
