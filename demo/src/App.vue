@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-link :to="{ name: 'Demo1', }"></router-link>
+    <router-link :to="{ name: 'Browser', }"></router-link>
     <router-view/>
   </div>
 </template>

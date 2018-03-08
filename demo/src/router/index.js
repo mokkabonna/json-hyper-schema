@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Dashboard from '@/components/Dashboard'
-import Demo1 from '@/components/Demo1'
+import Browser from '@/components/Browser'
 
 Vue.use(Router)
 
@@ -14,8 +14,8 @@ export default new Router({
     },
     {
       path: '/browser',
-      name: 'Demo1',
-      component: Demo1
+      name: 'Browser',
+      component: Browser
     }
   ]
 })

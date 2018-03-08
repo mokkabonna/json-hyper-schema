@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="">
-    <router-link :to="{ name: 'Demo1' }">Demo 1</router-link>
+    <router-link :to="{ name: 'Browser' }">Api browser</router-link>
   </div>
 </template>
 
