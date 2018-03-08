@@ -1,0 +1,36 @@
+{
+  "$id": "https://schema.example.com/thing-collection",
+  "$schema": "http://json-schema.org/draft-07/hyper-schema#",
+  "base": "https://api.example.com/",
+  "type": "object",
+  "required": ["elements"],
+  "properties": {
+    "elements": {
+      "type": "array",
+      "items": {
+        "allOf": [{
+          "$ref": "thing.json#"
+        }],
+        "links": [{
+          "anchorPointer": "",
+          "rel": "item",
+          "href": "things/{id}",
+          "templateRequired": ["id"],
+          "targetSchema": {
+            "$ref": "thing.json#"
+          }
+        }]
+      }
+    }
+  },
+  "links": [{
+    "rel": "self",
+    "href": "things",
+    "targetSchema": {
+      "$ref": "#"
+    },
+    "submissionSchema": {
+      "$ref": "thing"
+    }
+  }]
+}
