@@ -203,20 +203,23 @@ describe('resolver', function() {
     })
   })
 
-  describe('resolve', function() {
-    var schema = {
-      $id: 'https://schema.example.com/entry',
-      $schema: 'http://json-schema.org/draft-07/hyper-schema#',
-      base: 'https://api.example.com/',
-      links: [{
-        rel: 'self',
-        href: ''
-      }, {
-        rel: 'about',
-        href: '/docs'
-      }]
-    }
-
+  describe('resolve with simple schema', function() {
+    var schema
+    beforeEach(function() {
+      schema = {
+        $id: 'https://schema.example.com/entry',
+        $schema: 'http://json-schema.org/draft-07/hyper-schema#',
+        base: 'https://api.example.com/',
+        links: [{
+          rel: 'self',
+          href: ''
+        }, {
+          rel: 'about',
+          href: '/docs'
+        }]
+      }
+    })
+    
     describe('not accepting input', function() {
       it('resolves non templated uris', function() {
         var resolved = resolver.resolve(schema, data, 'https://api.example.com')
@@ -387,6 +390,64 @@ describe('resolver', function() {
         expect(targetUri).to.equal('/authors/Martin/' + encodeURIComponent('I should be used'))
         expect(targetUri).to.equal(resolved[0].targetUri)
       })
+    })
+  })
+  
+  describe('resolve with subschema links', function() {
+    var schema
+    var data
+    beforeEach(function() {
+      schema = {
+        "type": "object",
+        "required": ["elements"],
+        "properties": {
+          "elements": {
+            "type": "array",
+            "items": {
+              "links": [{
+                "anchorPointer": "",
+                "rel": "item",
+                "href": "things/{id}"
+              }]
+            }
+          }
+        },
+        "links": [{
+          "rel": "self",
+          "href": ""
+        }]
+      }
+      
+      data = {
+        "elements": [
+          {"id": 12345, "data": {}},
+          {"id": 67890, "data": {}}
+        ]
+      }
+    })
+    
+    it('resolves item links', function () {
+      var resolved = resolver.resolve(schema, data, 'https://api.example.com/things')
+
+      expect(resolved).to.eql([{
+        contextUri: 'https://api.example.com/things',
+        contextPointer: '',
+        rel: 'self',
+        targetUri: 'https://api.example.com/things',
+        attachmentPointer: ''
+      }, {
+        "contextUri": "https://api.example.com/things",
+        "contextPointer": "",
+        "rel": "item",
+        "targetUri": "https://api.example.com/things/12345",
+        "attachmentPointer": "/elements/0"
+      }, {
+        "contextUri": "https://api.example.com/things",
+        "contextPointer": "",
+        "rel": "item",
+        "targetUri": "https://api.example.com/things/67890",
+        "attachmentPointer": "/elements/1"
+      }])
     })
   })
 })

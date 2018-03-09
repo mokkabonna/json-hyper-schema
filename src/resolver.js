@@ -2,6 +2,7 @@ const uriTemplates = require('uri-templates')
 const util = require('./relative-json-pointer')
 const extractSubSchema = require('./extract-sub-schema')
 const pointer = require('json-pointer')
+const traverse = require('json-schema-traverse')
 const URI = require('uri-js')
 const Ajv = require('ajv')
 const omit = require('lodash/omit')
@@ -92,7 +93,8 @@ function getDefaultInputValues(template, link, instance) {
   return defaultData
 }
 
-function resolveLink(ldo, instance, instanceUri) {
+function resolveLink(config, instance, instanceUri) {
+  let ldo = config.ldo
   let resolved = {
     contextUri: instanceUri,
     contextPointer: '',
@@ -104,6 +106,7 @@ function resolveLink(ldo, instance, instanceUri) {
     resolved.hrefInputTemplates = [ldo.href]
     resolved.hrefPrepopulatedInput = getDefaultInputValues(ldo.href, ldo, instance)
     resolved.hrefFixedInput = omit(getTemplateData(ldo.href, ldo, instance), Object.keys(resolved.hrefPrepopulatedInput))
+   
     resolved.fillHref = function(userSupplied) {
       var fixedData = omit(getTemplateData(ldo.href, ldo, instance), Object.keys(resolved.hrefPrepopulatedInput))
       var allData = merge({}, userSupplied, fixedData)
@@ -111,6 +114,7 @@ function resolveLink(ldo, instance, instanceUri) {
       resolved.targetUri = template.fill(allData)
       return resolved.targetUri
     }
+    
   } else {
     let template = uriTemplates(ldo.href)
     let uri
@@ -131,15 +135,32 @@ function resolveLink(ldo, instance, instanceUri) {
   return resolved
 }
 
-function resolve(schema, instance, instanceUri) {
-  if (!Array.isArray(schema.links)) return []
+function createLink(ldo, pointer) {
+  return {
+    schemaPointer: pointer,
+    ldo: ldo
+  }
+}
 
-  var links = schema.links.reduce(function(all, ldo) {
-    all.push(resolveLink(ldo, instance, instanceUri))
+function getAllSchemaLinks(schema) {
+  var links = []
+  
+  traverse(schema, function(subSchema, pointer) {
+    links = links.concat((subSchema.links || []).map(l => createLink(l, pointer)))
+  })
+  
+  return links
+}
+
+function resolve(schema, instance, instanceUri) {
+  var links = getAllSchemaLinks(schema)
+  
+  var resolvedLinks = links.reduce(function(all, config) {
+    all.push(resolveLink(config, instance, instanceUri))
     return all
   }, [])
 
-  return links
+  return resolvedLinks
 }
 
 module.exports = {

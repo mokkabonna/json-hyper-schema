@@ -3,7 +3,7 @@
   <nav>
     <label>
       Address
-      <input v-model="currentUri" class="address-bar u-full-width" >
+      <input v-model.lazy="currentUri" class="address-bar u-full-width" >
     </label>
   </nav>
   <main>
