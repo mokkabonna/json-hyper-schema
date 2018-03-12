@@ -1,7 +1,7 @@
 const uriTemplates = require('uri-templates')
 const util = require('./relative-json-pointer')
 const extractSubSchema = require('./extract-sub-schema')
-const pointer = require('json-pointer')
+const jsonPointer = require('json-pointer')
 const traverse = require('json-schema-traverse')
 const URI = require('uri-js')
 const Ajv = require('ajv')
@@ -38,7 +38,7 @@ function getTemplateData(template, link, instance) {
 
     function attemptSet() {
       try {
-        all[name] = pointer.get(instance, valuePointer)
+        all[name] = jsonPointer.get(instance, valuePointer)
       } catch (e) {}
     }
 
@@ -93,20 +93,20 @@ function getDefaultInputValues(template, link, instance) {
   return defaultData
 }
 
-function resolveLink(config, instance, instanceUri) {
+function resolveLink(config, instance, instanceUri, attachmentPointer) {
   let ldo = config.ldo
   let resolved = {
     contextUri: instanceUri,
     contextPointer: '',
     rel: ldo.rel,
-    attachmentPointer: ''
+    attachmentPointer: attachmentPointer || ''
   }
 
   if (ldo.hasOwnProperty('hrefSchema') && ldo.hrefSchema !== false) {
     resolved.hrefInputTemplates = [ldo.href]
     resolved.hrefPrepopulatedInput = getDefaultInputValues(ldo.href, ldo, instance)
     resolved.hrefFixedInput = omit(getTemplateData(ldo.href, ldo, instance), Object.keys(resolved.hrefPrepopulatedInput))
-   
+
     resolved.fillHref = function(userSupplied) {
       var fixedData = omit(getTemplateData(ldo.href, ldo, instance), Object.keys(resolved.hrefPrepopulatedInput))
       var allData = merge({}, userSupplied, fixedData)
@@ -114,7 +114,6 @@ function resolveLink(config, instance, instanceUri) {
       resolved.targetUri = template.fill(allData)
       return resolved.targetUri
     }
-    
   } else {
     let template = uriTemplates(ldo.href)
     let uri
@@ -135,28 +134,42 @@ function resolveLink(config, instance, instanceUri) {
   return resolved
 }
 
-function createLink(ldo, pointer) {
+function createLink(ldo, pointer, parentPointer) {
   return {
+    lastPointer: pointer.split('/').pop(),
     schemaPointer: pointer,
+    parentPointer: parentPointer,
     ldo: ldo
   }
 }
 
 function getAllSchemaLinks(schema) {
   var links = []
-  
-  traverse(schema, function(subSchema, pointer) {
-    links = links.concat((subSchema.links || []).map(l => createLink(l, pointer)))
+
+  traverse(schema, function(subSchema, pointer, root, parentPointer) {
+    links = links.concat((subSchema.links || []).map(l => createLink(l, pointer, parentPointer)))
   })
-  
+
   return links
+}
+
+function schemaToInstancePointer(pointer) {
+  return pointer.split('/').filter(p => p !== 'properties').join('/')
 }
 
 function resolve(schema, instance, instanceUri) {
   var links = getAllSchemaLinks(schema)
-  
+
   var resolvedLinks = links.reduce(function(all, config) {
-    all.push(resolveLink(config, instance, instanceUri))
+    if (config.lastPointer === 'items') {
+      var dataPointer = schemaToInstancePointer(config.parentPointer)
+      let arr = jsonPointer(instance, dataPointer)
+      if (Array.isArray(arr)) {
+        all = all.concat(arr.map((instanceData, i) => resolveLink(config, instanceData, instanceUri, dataPointer + '/' + i)))
+      }
+    } else {
+      all.push(resolveLink(config, instance, instanceUri))
+    }
     return all
   }, [])
 
