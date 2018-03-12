@@ -219,7 +219,7 @@ describe('resolver', function() {
         }]
       }
     })
-    
+
     describe('not accepting input', function() {
       it('resolves non templated uris', function() {
         var resolved = resolver.resolve(schema, data, 'https://api.example.com')
@@ -392,41 +392,44 @@ describe('resolver', function() {
       })
     })
   })
-  
+
   describe('resolve with subschema links', function() {
     var schema
     var data
     beforeEach(function() {
       schema = {
-        "type": "object",
-        "required": ["elements"],
-        "properties": {
-          "elements": {
-            "type": "array",
-            "items": {
-              "links": [{
-                "anchorPointer": "",
-                "rel": "item",
-                "href": "things/{id}"
+        type: 'object',
+        required: ['elements'],
+        properties: {
+          elements: {
+            type: 'array',
+            items: {
+              links: [{
+                anchorPointer: '',
+                rel: 'item',
+                href: 'things/{id}'
               }]
             }
           }
         },
-        "links": [{
-          "rel": "self",
-          "href": ""
+        links: [{
+          rel: 'self',
+          href: ''
         }]
       }
-      
+
       data = {
-        "elements": [
-          {"id": 12345, "data": {}},
-          {"id": 67890, "data": {}}
-        ]
+        elements: [{
+          id: 12345,
+          data: {}
+        }, {
+          id: 67890,
+          data: {}
+        }]
       }
     })
-    
-    it('resolves item links', function () {
+
+    it('resolves item links', function() {
       var resolved = resolver.resolve(schema, data, 'https://api.example.com/things')
 
       expect(resolved).to.eql([{
