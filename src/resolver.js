@@ -162,7 +162,6 @@ function resolve(schema, instance, instanceUri) {
   var links = getAllSchemaLinks(schema)
 
   var resolvedLinks = links.reduce(function(all, config) {
-    var subSchema = jsonPointer(schema, config.schemaPointer)
     if (config.parentKeyWord === 'items' && config.lastPointer !== 'items') {
       let dataPointer = schemaToInstancePointer(config.schemaPointer)
       all.push(resolveLink(config, jsonPointer(instance, dataPointer), instanceUri, dataPointer))
