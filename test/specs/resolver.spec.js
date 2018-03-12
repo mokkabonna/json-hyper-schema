@@ -439,17 +439,56 @@ describe('resolver', function() {
         targetUri: 'https://api.example.com/things',
         attachmentPointer: ''
       }, {
-        "contextUri": "https://api.example.com/things",
-        "contextPointer": "",
-        "rel": "item",
-        "targetUri": "https://api.example.com/things/12345",
-        "attachmentPointer": "/elements/0"
+        contextUri: 'https://api.example.com/things',
+        contextPointer: '',
+        rel: 'item',
+        targetUri: 'https://api.example.com/things/12345',
+        attachmentPointer: '/elements/0'
       }, {
-        "contextUri": "https://api.example.com/things",
-        "contextPointer": "",
-        "rel": "item",
-        "targetUri": "https://api.example.com/things/67890",
-        "attachmentPointer": "/elements/1"
+        contextUri: 'https://api.example.com/things',
+        contextPointer: '',
+        rel: 'item',
+        targetUri: 'https://api.example.com/things/67890',
+        attachmentPointer: '/elements/1'
+      }])
+    })
+
+    it('resolves when item is array', function() {
+      schema = {
+        type: 'object',
+        required: ['elements'],
+        properties: {
+          elements: {
+            type: 'array',
+            items: [{
+              links: [{
+                anchorPointer: '',
+                rel: 'item',
+                href: 'things/{id}'
+              }]
+            }]
+          }
+        },
+        links: [{
+          rel: 'self',
+          href: ''
+        }]
+      }
+
+      var resolved = resolver.resolve(schema, data, 'https://api.example.com/things')
+
+      expect(resolved).to.eql([{
+        contextUri: 'https://api.example.com/things',
+        contextPointer: '',
+        rel: 'self',
+        targetUri: 'https://api.example.com/things',
+        attachmentPointer: ''
+      }, {
+        contextUri: 'https://api.example.com/things',
+        contextPointer: '',
+        rel: 'item',
+        targetUri: 'https://api.example.com/things/12345',
+        attachmentPointer: '/elements/0'
       }])
     })
   })

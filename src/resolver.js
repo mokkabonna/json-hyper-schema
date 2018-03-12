@@ -134,11 +134,12 @@ function resolveLink(config, instance, instanceUri, attachmentPointer) {
   return resolved
 }
 
-function createLink(ldo, pointer, parentPointer) {
+function createLink(ldo, pointer, parentPointer, parentKeyWord) {
   return {
+    parentKeyWord,
     lastPointer: pointer.split('/').pop(),
-    schemaPointer: pointer,
-    parentPointer: parentPointer,
+    schemaPointer: pointer || '',
+    parentPointer: parentPointer || '',
     ldo: ldo
   }
 }
@@ -146,29 +147,33 @@ function createLink(ldo, pointer, parentPointer) {
 function getAllSchemaLinks(schema) {
   var links = []
 
-  traverse(schema, function(subSchema, pointer, root, parentPointer) {
-    links = links.concat((subSchema.links || []).map(l => createLink(l, pointer, parentPointer)))
+  traverse(schema, function(subSchema, pointer, root, parentPointer, parentKeyWord) {
+    links = links.concat((subSchema.links || []).map(l => createLink(l, pointer, parentPointer, parentKeyWord)))
   })
 
   return links
 }
 
 function schemaToInstancePointer(pointer) {
-  return pointer.split('/').filter(p => p !== 'properties').join('/')
+  return pointer.split('/properties/').join('/').split('/items/').join('/')
 }
 
 function resolve(schema, instance, instanceUri) {
   var links = getAllSchemaLinks(schema)
 
   var resolvedLinks = links.reduce(function(all, config) {
-    if (config.lastPointer === 'items') {
-      var dataPointer = schemaToInstancePointer(config.parentPointer)
+    var subSchema = jsonPointer(schema, config.schemaPointer)
+    if (config.parentKeyWord === 'items' && config.lastPointer !== 'items') {
+      let dataPointer = schemaToInstancePointer(config.schemaPointer)
+      all.push(resolveLink(config, jsonPointer(instance, dataPointer), instanceUri, dataPointer))
+    } else if (config.lastPointer === 'items') {
+      let dataPointer = schemaToInstancePointer(config.parentPointer)
       let arr = jsonPointer(instance, dataPointer)
       if (Array.isArray(arr)) {
         all = all.concat(arr.map((instanceData, i) => resolveLink(config, instanceData, instanceUri, dataPointer + '/' + i)))
       }
     } else {
-      all.push(resolveLink(config, instance, instanceUri))
+      all.push(resolveLink(config, instance, instanceUri, ''))
     }
     return all
   }, [])
