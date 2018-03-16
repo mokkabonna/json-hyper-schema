@@ -1,7 +1,7 @@
 {
   "$id": "https://schema.example.com/thing",
   "$schema": "http://json-schema.org/draft-07/hyper-schema#",
-  "base": "https://api.example.com/",
+  "base": "https://api.example.com/things/",
   "type": "object",
   "required": ["data"],
   "properties": {
@@ -12,7 +12,7 @@
   },
   "links": [{
     "rel": "self",
-    "href": "things/{id}",
+    "href": "{id}",
     "templateRequired": ["id"],
     "targetSchema": {
       "$ref": "#"

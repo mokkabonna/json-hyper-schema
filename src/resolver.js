@@ -150,7 +150,7 @@ function getAllSchemaLinks(schema) {
   traverse(schema, function(subSchema, pointer, root, parentPointer, parentKeyWord) {
     links = links.concat((subSchema.links || []).map(l => createLink(l, pointer, parentPointer, parentKeyWord)))
   })
-
+  console.log(links)
   return links
 }
 

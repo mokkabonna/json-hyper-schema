@@ -46,7 +46,7 @@ app.get('/api/things/:id', function(req, res) {
   }
   res.set('link', formatter(links))
 
-  if (req.params.id === 12345) {
+  if (req.params.id === '12345') {
     res.send({id: 12345, data: {}})
   } else {
     res.send({id: 67890, data: {}})

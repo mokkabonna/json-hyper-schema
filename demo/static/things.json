@@ -9,7 +9,32 @@
       "type": "array",
       "items": {
         "allOf": [{
-          "$ref": "thing.json#"
+          "$id": "https://schema.example.com/thing",
+          "$schema": "http://json-schema.org/draft-07/hyper-schema#",
+          "base": "https://api.example.com/things",
+          "type": "object",
+          "required": ["data"],
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/id"
+            },
+            "data": true
+          },
+          "links": [{
+            "rel": "self",
+            "href": "{id}",
+            "templateRequired": ["id"],
+            "targetSchema": {
+              "$ref": "#"
+            }
+          }],
+          "definitions": {
+            "id": {
+              "type": "integer",
+              "minimum": 1,
+              "readOnly": true
+            }
+          }
         }],
         "links": [{
           "anchorPointer": "",

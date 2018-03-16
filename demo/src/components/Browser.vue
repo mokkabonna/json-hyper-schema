@@ -14,12 +14,12 @@
   <nav>
     <h1>Links</h1>
     <ul class="links">
-      <li v-for="link in resource.links" :key="link.rel">
+      <li v-for="link in resource.links" :key="link.rel + link.uri">
         <router-link :to="{ name: 'Browser', query: {uri: link.uri} }">{{link.title || link.rel}}</router-link>
       </li>
     </ul>
     <ul v-if="fetchSchemas.isResolved" class="links">
-      <li v-for="link in schemaLinks" :key="link.rel">
+      <li v-for="link in schemaLinks" :key="link.rel + link.targetUri">
         <router-link :to="{ name: 'Browser', query: {uri: link.targetUri} }">{{link.title || link.rel}}</router-link>
       </li>
     </ul>
