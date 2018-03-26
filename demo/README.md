@@ -2,6 +2,14 @@
 
 > a demo of json hyper schema
 
+Implements the following:
+
+- Extraction of describedBy link header
+- Collection and templating of instance links
+- Navigation between linked resources
+- Submission of new item to list
+
+
 ## Build Setup
 
 ``` bash

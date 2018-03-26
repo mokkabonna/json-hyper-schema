@@ -21,6 +21,7 @@
     <ul v-if="fetchSchemas.isResolved" class="links">
       <li v-for="link in schemaLinks" :key="link.rel + link.targetUri">
         <router-link :to="{ name: 'Browser', query: {uri: link.targetUri} }">{{link.title || link.rel}}</router-link>
+        <router-link :to="{ name: 'Browser', query: {uri: link.targetUri} }">{{link.targetUri}}</router-link>
       </li>
     </ul>
   </nav>
