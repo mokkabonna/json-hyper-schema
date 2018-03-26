@@ -16,7 +16,7 @@
     "format-link-header": "^2.1.0",
     "http-link-header": "^0.8.0",
     "vue": "^2.5.2",
-    "vue-async-methods": "^0.8.1",
+    "vue-async-methods": "^0.9.1",
     "vue-json-schema": "^1.1.0",
     "vue-router": "^3.0.1",
     "vue-vuelidate-jsonschema": "^0.13.4",

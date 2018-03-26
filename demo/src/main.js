@@ -4,6 +4,11 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import AsyncMethods from 'vue-async-methods'
+import VueVuelidateJsonschema from 'vue-vuelidate-jsonschema'
+import Vuelidate from 'vuelidate'
+
+Vue.use(VueVuelidateJsonschema)
+Vue.use(Vuelidate)
 
 Vue.config.productionTip = false
 Vue.use(AsyncMethods, {

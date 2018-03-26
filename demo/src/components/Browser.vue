@@ -24,6 +24,10 @@
       </li>
     </ul>
   </nav>
+  <section class="forms">
+    <h1>Forms</h1>
+    <schema-form v-for="link in schemaForms" :key="link.rel + link.uri" :propsSchema="link.ldo.submissionSchema" @submit="submit(link, $event)" />
+  </section>
   <aside>
     <h1>Meta</h1>
     <table class="meta">
@@ -44,6 +48,7 @@
 <script>
 import LinkHeader from 'http-link-header'
 import hyperSchema from '../../../src/resolver'
+import SchemaForm from './SchemaForm'
 import _ from 'lodash'
 
 const client = {
@@ -86,10 +91,22 @@ const client = {
         return result
       })
     })
+  },
+  submit: function(uri, data) {
+    return fetch(uri, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
   }
 }
 
 export default {
+  components: {
+    SchemaForm
+  },
   data() {
     return {
       defaultUri: '/api'
@@ -101,6 +118,10 @@ export default {
       return _.flatten(this.schemas.map((schema) => {
         return hyperSchema.resolve(schema, this.resource.body, this.$route.query.uri)
       }))
+    },
+    schemaForms() {
+      if (!this.schemaLinks) return []
+      return this.schemaLinks.filter(l => l.ldo.submissionSchema)
     },
     currentUri: {
       get() {
@@ -119,6 +140,7 @@ export default {
     }
   },
   created() {
+    window.d = this
     if (!this.$route.query.uri) {
       this.$router.replace({
         query: {
@@ -132,15 +154,18 @@ export default {
     '$route' (route) {
       this.fetchResource.execute(route.query.uri)
     },
-    'fetchResource.isResolved' () {
+    'fetchResource.isResolved' (isResolved) {
       this.$nextTick(() => {
-        if (!this.resource.isJSON) {
+        if (isResolved && !this.resource.isJSON) {
           this.$refs.iframe.src = 'data:text/html;charset=utf-8,' + this.resource.body
         }
       })
     }
   },
   asyncMethods: {
+    submit: function(link, data) {
+      return client.submit(link.targetUri, data)
+    },
     fetchResource: function(uri) {
       return client.get(uri).then((resource) => {
         this.fetchSchemas.execute(resource)
@@ -158,12 +183,14 @@ export default {
 }
 </script>
 <style scoped>
-aside h1, nav h1 {
+aside h1,
+nav h1 {
   font-size: 30px;
   border-bottom: solid 1px #333;
 }
 
-aside, nav {
+aside,
+nav {
   margin-bottom: 20px;
 }
 
@@ -196,5 +223,10 @@ table.meta {
 
 .address-bar {
   padding: 2px 5px;
+}
+
+section.forms h1 {
+  font-size: 30px;
+  border-bottom: solid 1px #333;
 }
 </style>

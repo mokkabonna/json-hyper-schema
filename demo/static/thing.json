@@ -3,12 +3,17 @@
   "$schema": "http://json-schema.org/draft-07/hyper-schema#",
   "base": "https://api.example.com/things/",
   "type": "object",
-  "required": ["data"],
+  "required": ["name"],
   "properties": {
     "id": {
-      "$ref": "#/definitions/id"
+      "type": "integer",
+      "minimum": 1,
+      "readOnly": true
     },
-    "data": true
+    "name": {
+      "type": "string",
+      "minLength": 2
+    }
   },
   "links": [{
     "rel": "self",
@@ -17,12 +22,5 @@
     "targetSchema": {
       "$ref": "#"
     }
-  }],
-  "definitions": {
-    "id": {
-      "type": "integer",
-      "minimum": 1,
-      "readOnly": true
-    }
-  }
+  }]
 }
