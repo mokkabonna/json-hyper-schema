@@ -99,7 +99,8 @@ function resolveLink(config, instance, instanceUri, attachmentPointer) {
     contextUri: instanceUri,
     contextPointer: '',
     rel: ldo.rel,
-    attachmentPointer: attachmentPointer || ''
+    attachmentPointer: attachmentPointer || '',
+    ldo: ldo
   }
 
   if (ldo.hasOwnProperty('hrefSchema') && ldo.hrefSchema !== false) {
@@ -150,7 +151,7 @@ function getAllSchemaLinks(schema) {
   traverse(schema, function(subSchema, pointer, root, parentPointer, parentKeyWord) {
     links = links.concat((subSchema.links || []).map(l => createLink(l, pointer, parentPointer, parentKeyWord)))
   })
-  console.log(links)
+
   return links
 }
 
@@ -176,7 +177,6 @@ function resolve(schema, instance, instanceUri) {
     }
     return all
   }, [])
-
   return resolvedLinks
 }
 
