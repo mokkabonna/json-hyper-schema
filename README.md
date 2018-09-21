@@ -48,7 +48,7 @@ resolver
     ✓ returns empty object when no templated parts
     ✓ returns data from instance when templated
     ✓ returns empty if not existing in the template
-    ✓ supports absoute templatePointers
+    ✓ supports absolute templatePointers
     ✓ supports relative templatePointers
   getDefaultInputValues
     ✓ gets an object with the default values set
