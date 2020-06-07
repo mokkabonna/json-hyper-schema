@@ -1,8 +1,8 @@
 {
   "name": "json-hyper-schema",
-  "version": "0.1.0",
-  "description": "A json hyper schema implementation.",
-  "main": "src/index.js",
+  "version": "0.1.1",
+  "description": "A json hyper schema implementation. - Forked from Martin Hansen",
+  "main": "./index.js",
   "directories": {
     "test": "test"
   },
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mokkabonna/json-hyper-schema.git"
+    "url": "git+https://github.com/temp3l/json-hyper-schema.git"
   },
   "keywords": [
     "json",
@@ -22,12 +22,12 @@
     "schema",
     "json-hyper-schema"
   ],
-  "author": "Martin Hansen",
+  "author": "Steph",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mokkabonna/json-hyper-schema/issues"
+    "url": "https://github.com/temp3l/json-hyper-schema/issues"
   },
-  "homepage": "https://github.com/mokkabonna/json-hyper-schema#readme",
+  "homepage": "https://github.com/temp3l/json-hyper-schema#readme",
   "devDependencies": {
     "chai": "^4.1.2",
     "uri-js": "^3.0.2",
