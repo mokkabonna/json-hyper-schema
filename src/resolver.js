@@ -118,7 +118,7 @@ function resolveLink(config, instance, instanceUri, attachmentPointer) {
   } else {
     let template = uriTemplates(ldo.href)
     let uri
-
+    let templatedInstance = {}
     if (template.varNames.length) {
       if (template.varNames.every(n => instance.hasOwnProperty(n))) {
         uri = template.fill(instance)
@@ -126,7 +126,16 @@ function resolveLink(config, instance, instanceUri, attachmentPointer) {
     } else {
       uri = ldo.href
     }
-
+    if (ldo.templateRequired) {
+      ldo.templateRequired.forEach((prop) => {
+        try {
+          templatedInstance[prop] = jsonPointer.get(instance, ldo.templatePointers[prop])
+        } catch (e) {
+          console.log(`Cannot find required template key: ${e}`)
+        }
+      })
+      uri = template.fill(templatedInstance)
+    }
     if (uri !== undefined) {
       resolved.targetUri = URI.resolve(instanceUri, uri)
     }
