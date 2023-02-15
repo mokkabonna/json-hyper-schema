@@ -8,6 +8,8 @@ const Ajv = require('ajv');
 const omit = require('lodash/omit');
 const merge = require('lodash/merge');
 
+const has = Reflect.has;
+
 const ajv = new Ajv();
 
 const isRelative = jsonPointer => /^\d+/.test(jsonPointer);
@@ -22,12 +24,14 @@ function getTemplateData(template, link, instance) {
     name = decodeURIComponent(name);
     var valuePointer;
 
-    if (templatePointers.hasOwnProperty(name)) {
+    if (has(templatePointers, name)) {
       valuePointer = templatePointers[name];
       if (isRelative(valuePointer)) {
         try {
           all[name] = util.resolve(instance, attachmentPointer, valuePointer);
-        } catch (e) {}
+        } catch (e) {
+          // Ignore for now
+        }
       } else {
         attemptSet();
       }
@@ -39,7 +43,9 @@ function getTemplateData(template, link, instance) {
     function attemptSet() {
       try {
         all[name] = jsonPointer.get(instance, valuePointer);
-      } catch (e) {}
+      } catch (e) {
+        // Ignore for now
+      }
     }
 
     return all;
@@ -72,7 +78,7 @@ function getDefaultInputValues(template, link, instance) {
   var templateData = getTemplateData(template, link, instance);
   var parsedTemplate = uriTemplates(template);
 
-  if (link.hrefSchema === false || !link.hasOwnProperty('hrefSchema')) {
+  if (link.hrefSchema === false || !has(link, 'hrefSchema')) {
     return {};
   }
 
@@ -103,7 +109,7 @@ function resolveLink(config, instance, instanceUri, attachmentPointer) {
     ldo: ldo,
   };
 
-  if (ldo.hasOwnProperty('hrefSchema') && ldo.hrefSchema !== false) {
+  if (has(ldo, 'hrefSchema') && ldo.hrefSchema !== false) {
     resolved.hrefInputTemplates = [ldo.href];
     resolved.hrefPrepopulatedInput = getDefaultInputValues(
       ldo.href,
@@ -130,7 +136,7 @@ function resolveLink(config, instance, instanceUri, attachmentPointer) {
     let uri;
 
     if (template.varNames.length) {
-      if (template.varNames.every(n => instance.hasOwnProperty(n))) {
+      if (template.varNames.every(n => has(instance, n))) {
         uri = template.fill(instance);
       }
     } else {

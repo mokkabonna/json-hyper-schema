@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 const isNotEmptyObject = o => _.isPlainObject(o) && Object.keys(o).length > 0;
 const isRestrictingSchema = s => isNotEmptyObject(s) || s === false;
-const has = (o, name) => o.hasOwnProperty(name);
+const has = (o, name) => Reflect.has(o, name);
 const isArray = Array.isArray;
 
 module.exports = function extractSchemas(schema, jsonPointer, options) {
