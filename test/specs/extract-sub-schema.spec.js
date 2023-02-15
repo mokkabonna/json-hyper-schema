@@ -1,8 +1,7 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { extractSchemas } from '../../src/extract-sub-schema.js';
-const expect = chai.expect;
 
-describe.only('extract sub schema', function () {
+describe('extract sub schema', function () {
   var schema;
 
   beforeEach(function () {

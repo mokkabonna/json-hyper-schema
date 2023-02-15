@@ -1,11 +1,10 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import {
   resolveLinks,
   getTemplateData,
   getDefaultInputValues,
 } from '../../src/resolver.js';
 import _ from 'lodash';
-const expect = chai.expect;
 
 describe('resolver', function () {
   var link;

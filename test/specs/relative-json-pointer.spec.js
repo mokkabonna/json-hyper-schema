@@ -1,6 +1,5 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import { resolve } from '../../src/relative-json-pointer.js';
-const expect = chai.expect;
 
 describe('relative json pointer util', function () {
   var data;
