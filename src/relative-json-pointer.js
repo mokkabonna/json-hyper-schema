@@ -1,4 +1,4 @@
-var pointer = require('json-pointer');
+import pointer from 'json-pointer';
 
 function resolve(data, base, relative) {
   var tokens = pointer.parse(base);
@@ -38,6 +38,4 @@ function resolve(data, base, relative) {
   }
 }
 
-module.exports = {
-  resolve,
-};
+export { resolve };

@@ -1,24 +1,25 @@
-const pointer = require('json-pointer');
-const _ = require('lodash');
+// convert to imports
+import pointer from 'json-pointer';
+import { isPlainObject, attempt, merge, reduce } from 'lodash-es';
 
-const isNotEmptyObject = o => _.isPlainObject(o) && Object.keys(o).length > 0;
+const isNotEmptyObject = o => isPlainObject(o) && Object.keys(o).length > 0;
 const isRestrictingSchema = s => isNotEmptyObject(s) || s === false;
 const has = (o, name) => Reflect.has(o, name);
 const isArray = Array.isArray;
 
-module.exports = function extractSchemas(schema, jsonPointer, options) {
+function extractSchemas(schema, jsonPointer, options) {
   options = options || {};
   var tokens = pointer.parse(jsonPointer);
   var lastToken = tokens[tokens.length - 1];
   var newSchema = {};
   var hasPatternProperty = false;
 
-  _.attempt(function () {
+  attempt(function () {
     var subSchema = pointer.get(schema, jsonPointer);
     if (subSchema === false) {
       newSchema = false;
     } else {
-      _.merge(newSchema, subSchema);
+      merge(newSchema, subSchema);
     }
   });
 
@@ -41,7 +42,7 @@ module.exports = function extractSchemas(schema, jsonPointer, options) {
   }
 
   if (has(schema, 'patternProperties')) {
-    var patternSchemas = _.reduce(
+    var patternSchemas = reduce(
       schema.patternProperties,
       function (all, schema, key) {
         if (new RegExp(key).test(lastToken)) {
@@ -80,4 +81,6 @@ module.exports = function extractSchemas(schema, jsonPointer, options) {
   }
 
   return newSchema;
-};
+}
+
+export { extractSchemas };

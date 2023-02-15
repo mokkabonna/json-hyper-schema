@@ -1,12 +1,12 @@
-const uriTemplates = require('uri-templates');
-const util = require('./relative-json-pointer');
-const extractSubSchema = require('./extract-sub-schema');
-const jsonPointer = require('json-pointer');
-const traverse = require('json-schema-traverse');
-const URI = require('uri-js');
-const Ajv = require('ajv');
-const omit = require('lodash/omit');
-const merge = require('lodash/merge');
+//convert all to import from statements
+import uriTemplates from 'uri-templates';
+import { resolve } from './relative-json-pointer.js';
+import { extractSchemas } from './extract-sub-schema.js';
+import jsonPointer from 'json-pointer';
+import traverse from 'json-schema-traverse';
+import URI from 'uri-js';
+import Ajv from 'ajv';
+import { merge, omit } from 'lodash-es';
 
 const has = Reflect.has;
 
@@ -28,7 +28,7 @@ function getTemplateData(template, link, instance) {
       valuePointer = templatePointers[name];
       if (isRelative(valuePointer)) {
         try {
-          all[name] = util.resolve(instance, attachmentPointer, valuePointer);
+          all[name] = resolve(instance, attachmentPointer, valuePointer);
         } catch (e) {
           // Ignore for now
         }
@@ -83,7 +83,7 @@ function getDefaultInputValues(template, link, instance) {
   }
 
   var defaultData = parsedTemplate.varNames.reduce(function (all, name) {
-    var subSchema = extractSubSchema(link.hrefSchema, '/properties/' + name);
+    var subSchema = extractSchemas(link.hrefSchema, '/properties/' + name);
 
     if (simplify(subSchema) !== false) {
       all[name] = undefined;
@@ -182,7 +182,7 @@ function schemaToInstancePointer(pointer) {
   return pointer.split('/properties/').join('/').split('/items/').join('/');
 }
 
-function resolve(schema, instance, instanceUri) {
+function resolveLinks(schema, instance, instanceUri) {
   var links = getAllSchemaLinks(schema);
 
   var resolvedLinks = links.reduce(function (all, config) {
@@ -218,9 +218,4 @@ function resolve(schema, instance, instanceUri) {
   }, []);
   return resolvedLinks;
 }
-
-module.exports = {
-  getDefaultInputValues,
-  getTemplateData,
-  resolve,
-};
+export { getDefaultInputValues, getTemplateData, resolveLinks };
