@@ -24,31 +24,34 @@
   ],
   "author": "Martin Hansen",
   "license": "MIT",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/mokkabonna/json-hyper-schema/issues"
   },
   "homepage": "https://github.com/mokkabonna/json-hyper-schema#readme",
   "devDependencies": {
     "chai": "^4.1.2",
-    "uri-js": "^3.0.2",
-    "nyc": "^11.2.1",
     "coveralls": "^3.0.0",
-    "eslint": "^4.8.0",
+    "eslint": "^8.34.0",
     "eslint-config": "^0.3.0",
     "eslint-config-standard": "^10.2.1",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-node": "^5.2.0",
-    "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0",
     "json-schema-ref-parser": "^3.3.1",
     "json-stringify-safe": "^5.0.1",
-    "mocha": "^4.0.1"
+    "mocha": "^4.0.1",
+    "nyc": "^11.2.1",
+    "uri-js": "^3.0.2"
   },
   "dependencies": {
-    "eslint": "^4.18.1",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "json-pointer": "^0.6.0",
     "json-schema-traverse": "^0.3.1",
     "lodash": "^4.17.5",
+    "prettier": "^2.8.4",
     "uri-templates": "^0.2.0"
   }
 }

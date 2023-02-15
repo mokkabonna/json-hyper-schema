@@ -1,402 +1,500 @@
-const chai = require('chai')
-const resolver = require('../../src/resolver')
-const expect = chai.expect
-const _ = require('lodash')
+const chai = require('chai');
+const resolver = require('../../src/resolver');
+const expect = chai.expect;
+const _ = require('lodash');
 
-describe('resolver', function() {
-  var link
-  var data
+describe('resolver', function () {
+  var link;
+  var data;
 
-  beforeEach(function() {
+  beforeEach(function () {
     link = {
       rel: 'about',
-      href: '/about'
-    }
-    data = {}
-  })
+      href: '/about',
+    };
+    data = {};
+  });
 
-  describe('getTemplateData', function() {
-    it('returns empty object when no templated parts', function() {
-      var result = resolver.getTemplateData(link.href, link, data)
-      expect(result).to.eql({})
-    })
+  describe('getTemplateData', function () {
+    it('returns empty object when no templated parts', function () {
+      var result = resolver.getTemplateData(link.href, link, data);
+      expect(result).to.eql({});
+    });
 
-    it('returns data from instance when templated', function() {
-      var result = resolver.getTemplateData('/products/{id%28}', {
-        rel: 'self',
-        href: 'notImportant'
-      }, {
-        'id(': 7
-      })
+    it('returns data from instance when templated', function () {
+      var result = resolver.getTemplateData(
+        '/products/{id%28}',
+        {
+          rel: 'self',
+          href: 'notImportant',
+        },
+        {
+          'id(': 7,
+        }
+      );
       expect(result).to.eql({
-        'id(': 7
-      })
-    })
+        'id(': 7,
+      });
+    });
 
-    it('returns empty if not existing in the template', function() {
-      var result = resolver.getTemplateData('/products/{id%28}', {
-        rel: 'self',
-        href: 'notImportant'
-      }, {})
-      expect(result).to.eql({})
-    })
+    it('returns empty if not existing in the template', function () {
+      var result = resolver.getTemplateData(
+        '/products/{id%28}',
+        {
+          rel: 'self',
+          href: 'notImportant',
+        },
+        {}
+      );
+      expect(result).to.eql({});
+    });
 
-    it('supports absoute templatePointers', function() {
-      var result = resolver.getTemplateData('/products/{id}', {
-        rel: 'self',
-        href: 'notImportant',
-        templatePointers: {
-          id: '/child/id'
-        }
-      }, {
-        id: 8,
-        child: {
-          id: 9
-        }
-      })
-      expect(result).to.eql({
-        id: 9
-      })
-    })
-
-    it('supports relative templatePointers', function() {
-      var result = resolver.getTemplateData('/products/{id}', {
-        rel: 'self',
-        href: 'notImportant',
-        templatePointers: {
-          id: '0/child/id'
-        }
-      }, {
-        id: 8,
-        child: {
-          id: 9
-        }
-      })
-      expect(result).to.eql({
-        id: 9
-      })
-
-      result = resolver.getTemplateData('/products/{id}', {
-        rel: 'self',
-        href: 'notImportant',
-        attachmentPointer: '/child/id',
-        templatePointers: {
-          id: '2/child/id'
-        }
-      }, {
-        id: 8,
-        child: {
-          id: 9
-        }
-      })
-      expect(result).to.eql({
-        id: 9
-      })
-
-      result = resolver.getTemplateData('/products/{id}', {
-        rel: 'self',
-        href: 'notImportant',
-        attachmentPointer: '/child/id',
-        templatePointers: {
-          id: '2/id'
-        }
-      }, {
-        id: 8,
-        child: {
-          id: 9
-        }
-      })
-      expect(result).to.eql({
-        id: 8
-      })
-    })
-  })
-
-  describe('getDefaultInputValues', function() {
-    it('gets an object with the default values set', function() {
-      var result = resolver.getDefaultInputValues('/products/{id}', {
-        rel: 'self',
-        href: 'notImportant',
-        hrefSchema: {
-          properties: {
-            id: {
-              type: 'integer',
-              minimum: 1
-            }
-          }
-        }
-      }, {
-        id: 1
-      })
-
-      expect(result).to.eql({
-        id: 1
-      })
-    })
-
-    it('does not include values if not valid (but sets undefined)', function() {
-      var result = resolver.getDefaultInputValues('/products/{id}', {
-        rel: 'self',
-        href: 'notImportant',
-        hrefSchema: {
-          properties: {
-            id: {
-              type: 'integer',
-              minimum: 1
-            }
-          }
-        }
-      }, {
-        id: 0
-      })
-
-      expect(result).to.eql({
-        id: undefined
-      })
-    })
-
-    it('excludes properties with with false set in subschema', function() {
-      var result = resolver.getDefaultInputValues('/products/{id}', {
-        rel: 'self',
-        href: '/products/{id}',
-        hrefSchema: {
-          properties: {
-            id: false
-          }
-        }
-      }, {
-        id: 0
-      })
-
-      expect(result).to.eql({})
-
-      result = resolver.getDefaultInputValues('/products/{id}', {
-        rel: 'self',
-        href: '/products/{id}',
-        hrefSchema: {
-          properties: {
-            id: true
+    it('supports absoute templatePointers', function () {
+      var result = resolver.getTemplateData(
+        '/products/{id}',
+        {
+          rel: 'self',
+          href: 'notImportant',
+          templatePointers: {
+            id: '/child/id',
           },
-          allOf: [{
-            properties: {
-              id: false
-            }
-          }]
+        },
+        {
+          id: 8,
+          child: {
+            id: 9,
+          },
         }
-      }, {
-        id: 0
-      })
+      );
+      expect(result).to.eql({
+        id: 9,
+      });
+    });
 
-      expect(result).to.eql({})
-    })
+    it('supports relative templatePointers', function () {
+      var result = resolver.getTemplateData(
+        '/products/{id}',
+        {
+          rel: 'self',
+          href: 'notImportant',
+          templatePointers: {
+            id: '0/child/id',
+          },
+        },
+        {
+          id: 8,
+          child: {
+            id: 9,
+          },
+        }
+      );
+      expect(result).to.eql({
+        id: 9,
+      });
 
-    it('return empty object if no input allowed', function() {
-      var result = resolver.getDefaultInputValues('/products/{id}', {
-        rel: 'self',
-        href: '/products/{id}',
-        hrefSchema: false
-      }, {
-        id: 0
-      })
+      result = resolver.getTemplateData(
+        '/products/{id}',
+        {
+          rel: 'self',
+          href: 'notImportant',
+          attachmentPointer: '/child/id',
+          templatePointers: {
+            id: '2/child/id',
+          },
+        },
+        {
+          id: 8,
+          child: {
+            id: 9,
+          },
+        }
+      );
+      expect(result).to.eql({
+        id: 9,
+      });
 
-      expect(result).to.eql({})
-    })
-  })
+      result = resolver.getTemplateData(
+        '/products/{id}',
+        {
+          rel: 'self',
+          href: 'notImportant',
+          attachmentPointer: '/child/id',
+          templatePointers: {
+            id: '2/id',
+          },
+        },
+        {
+          id: 8,
+          child: {
+            id: 9,
+          },
+        }
+      );
+      expect(result).to.eql({
+        id: 8,
+      });
+    });
+  });
 
-  describe('resolve with simple schema', function() {
-    var schema
-    beforeEach(function() {
+  describe('getDefaultInputValues', function () {
+    it('gets an object with the default values set', function () {
+      var result = resolver.getDefaultInputValues(
+        '/products/{id}',
+        {
+          rel: 'self',
+          href: 'notImportant',
+          hrefSchema: {
+            properties: {
+              id: {
+                type: 'integer',
+                minimum: 1,
+              },
+            },
+          },
+        },
+        {
+          id: 1,
+        }
+      );
+
+      expect(result).to.eql({
+        id: 1,
+      });
+    });
+
+    it('does not include values if not valid (but sets undefined)', function () {
+      var result = resolver.getDefaultInputValues(
+        '/products/{id}',
+        {
+          rel: 'self',
+          href: 'notImportant',
+          hrefSchema: {
+            properties: {
+              id: {
+                type: 'integer',
+                minimum: 1,
+              },
+            },
+          },
+        },
+        {
+          id: 0,
+        }
+      );
+
+      expect(result).to.eql({
+        id: undefined,
+      });
+    });
+
+    it('excludes properties with with false set in subschema', function () {
+      var result = resolver.getDefaultInputValues(
+        '/products/{id}',
+        {
+          rel: 'self',
+          href: '/products/{id}',
+          hrefSchema: {
+            properties: {
+              id: false,
+            },
+          },
+        },
+        {
+          id: 0,
+        }
+      );
+
+      expect(result).to.eql({});
+
+      result = resolver.getDefaultInputValues(
+        '/products/{id}',
+        {
+          rel: 'self',
+          href: '/products/{id}',
+          hrefSchema: {
+            properties: {
+              id: true,
+            },
+            allOf: [
+              {
+                properties: {
+                  id: false,
+                },
+              },
+            ],
+          },
+        },
+        {
+          id: 0,
+        }
+      );
+
+      expect(result).to.eql({});
+    });
+
+    it('return empty object if no input allowed', function () {
+      var result = resolver.getDefaultInputValues(
+        '/products/{id}',
+        {
+          rel: 'self',
+          href: '/products/{id}',
+          hrefSchema: false,
+        },
+        {
+          id: 0,
+        }
+      );
+
+      expect(result).to.eql({});
+    });
+  });
+
+  describe('resolve with simple schema', function () {
+    var schema;
+    beforeEach(function () {
       schema = {
         $id: 'https://schema.example.com/entry',
         $schema: 'http://json-schema.org/draft-07/hyper-schema#',
         base: 'https://api.example.com/',
-        links: [{
-          rel: 'self',
-          href: ''
-        }, {
-          rel: 'about',
-          href: '/docs'
-        }]
-      }
-    })
-
-    describe('not accepting input', function() {
-      it('resolves non templated uris', function() {
-        var resolved = resolver.resolve(schema, data, 'https://api.example.com')
-
-        expect(resolved).to.eql([{
-          contextUri: 'https://api.example.com',
-          contextPointer: '',
-          rel: 'self',
-          targetUri: 'https://api.example.com/',
-          attachmentPointer: ''
-        }, {
-          contextUri: 'https://api.example.com',
-          contextPointer: '',
-          rel: 'about',
-          targetUri: 'https://api.example.com/docs',
-          attachmentPointer: ''
-        }])
-      })
-
-      it('resolves links with data from instance if not accepting input', function() {
-        var resolved = resolver.resolve({
-          links: [{
-            rel: 'author',
-            href: '/authors/{author}'
-          }]
-        }, {
-          author: 'Martin'
-        }, 'https://example.com')
-
-        expect(resolved).to.eql([{
-          contextUri: 'https://example.com',
-          contextPointer: '',
-          rel: 'author',
-          targetUri: 'https://example.com/authors/Martin',
-          attachmentPointer: ''
-        }])
-      })
-
-      it('does not set targetUri when it cannot be used', function() {
-        var resolved = resolver.resolve({
-          links: [{
-            rel: 'author',
-            href: '/authors/{author}/{extra}'
-          }]
-        }, {
-          author: 'Martin'
-        }, 'https://example.com')
-
-        expect(resolved).to.eql([{
-          contextUri: 'https://example.com',
-          contextPointer: '',
-          rel: 'author',
-          attachmentPointer: ''
-        }])
-      })
-
-      it('considers base')
-    })
-
-    describe('accepting input', function() {
-      it('resolves values that does not allow input', function() {
-        var resolved = resolver.resolve({
-          links: [{
-            rel: 'author',
-            href: '/authors/{author}/{extra}',
-            hrefSchema: {
-              properties: {
-                author: false,
-                extra: true
-              }
-            }
-          }]
-        }, {
-          author: 'Martin'
-        }, 'https://example.com')
-
-        expect(resolved.map(o => _.omit(o, 'fillHref'))).to.eql([{
-          contextUri: 'https://example.com',
-          contextPointer: '',
-          rel: 'author',
-          attachmentPointer: '',
-          hrefInputTemplates: [
-            '/authors/{author}/{extra}'
-          ],
-          hrefFixedInput: {
-            author: 'Martin'
+        links: [
+          {
+            rel: 'self',
+            href: '',
           },
-          hrefPrepopulatedInput: {
-            extra: undefined
-          }
-        }])
-      })
+          {
+            rel: 'about',
+            href: '/docs',
+          },
+        ],
+      };
+    });
 
-      it('allows overriding prepopulated input', function() {
-        var resolved = resolver.resolve({
-          links: [{
-            rel: 'author',
-            href: '/authors/{author}/{extra}',
-            hrefSchema: {
-              properties: {
-                author: true,
-                extra: true
-              }
-            }
-          }]
-        }, {
-          author: 'Martin'
-        }, 'https://example.com')
+    describe('not accepting input', function () {
+      it('resolves non templated uris', function () {
+        var resolved = resolver.resolve(
+          schema,
+          data,
+          'https://api.example.com'
+        );
 
-        expect(resolved.map(o => _.omit(o, 'fillHref'))).to.eql([{
-          contextUri: 'https://example.com',
-          contextPointer: '',
-          rel: 'author',
-          attachmentPointer: '',
-          hrefInputTemplates: [
-            '/authors/{author}/{extra}'
-          ],
-          hrefFixedInput: {},
-          hrefPrepopulatedInput: {
+        expect(resolved).to.eql([
+          {
+            contextUri: 'https://api.example.com',
+            contextPointer: '',
+            rel: 'self',
+            targetUri: 'https://api.example.com/',
+            attachmentPointer: '',
+          },
+          {
+            contextUri: 'https://api.example.com',
+            contextPointer: '',
+            rel: 'about',
+            targetUri: 'https://api.example.com/docs',
+            attachmentPointer: '',
+          },
+        ]);
+      });
+
+      it('resolves links with data from instance if not accepting input', function () {
+        var resolved = resolver.resolve(
+          {
+            links: [
+              {
+                rel: 'author',
+                href: '/authors/{author}',
+              },
+            ],
+          },
+          {
             author: 'Martin',
-            extra: undefined
-          }
-        }])
-      })
+          },
+          'https://example.com'
+        );
 
-      it('provides a function for fully templating the template', function() {
-        var resolved = resolver.resolve({
-          links: [{
+        expect(resolved).to.eql([
+          {
+            contextUri: 'https://example.com',
+            contextPointer: '',
             rel: 'author',
-            href: '/authors/{author}/{extra}',
-            hrefSchema: {
-              properties: {
-                author: true,
-                extra: true
-              }
-            }
-          }]
-        }, {
-          author: 'Martin'
-        }, 'https://example.com')
+            targetUri: 'https://example.com/authors/Martin',
+            attachmentPointer: '',
+          },
+        ]);
+      });
 
-        expect(resolved[0].fillHref).to.be.a('function')
-      })
+      it('does not set targetUri when it cannot be used', function () {
+        var resolved = resolver.resolve(
+          {
+            links: [
+              {
+                rel: 'author',
+                href: '/authors/{author}/{extra}',
+              },
+            ],
+          },
+          {
+            author: 'Martin',
+          },
+          'https://example.com'
+        );
 
-      it('does not allow input if schema is false', function() {
-        var resolved = resolver.resolve({
-          links: [{
+        expect(resolved).to.eql([
+          {
+            contextUri: 'https://example.com',
+            contextPointer: '',
             rel: 'author',
-            href: '/authors/{author}/{extra}',
-            hrefSchema: {
-              properties: {
-                author: false,
-                extra: true
-              }
-            }
-          }]
-        }, {
-          author: 'Martin'
-        }, 'https://example.com')
+            attachmentPointer: '',
+          },
+        ]);
+      });
 
-        expect(resolved[0].fillHref).to.be.a('function')
+      it('considers base');
+    });
+
+    describe('accepting input', function () {
+      it('resolves values that does not allow input', function () {
+        var resolved = resolver.resolve(
+          {
+            links: [
+              {
+                rel: 'author',
+                href: '/authors/{author}/{extra}',
+                hrefSchema: {
+                  properties: {
+                    author: false,
+                    extra: true,
+                  },
+                },
+              },
+            ],
+          },
+          {
+            author: 'Martin',
+          },
+          'https://example.com'
+        );
+
+        expect(resolved.map(o => _.omit(o, 'fillHref'))).to.eql([
+          {
+            contextUri: 'https://example.com',
+            contextPointer: '',
+            rel: 'author',
+            attachmentPointer: '',
+            hrefInputTemplates: ['/authors/{author}/{extra}'],
+            hrefFixedInput: {
+              author: 'Martin',
+            },
+            hrefPrepopulatedInput: {
+              extra: undefined,
+            },
+          },
+        ]);
+      });
+
+      it('allows overriding prepopulated input', function () {
+        var resolved = resolver.resolve(
+          {
+            links: [
+              {
+                rel: 'author',
+                href: '/authors/{author}/{extra}',
+                hrefSchema: {
+                  properties: {
+                    author: true,
+                    extra: true,
+                  },
+                },
+              },
+            ],
+          },
+          {
+            author: 'Martin',
+          },
+          'https://example.com'
+        );
+
+        expect(resolved.map(o => _.omit(o, 'fillHref'))).to.eql([
+          {
+            contextUri: 'https://example.com',
+            contextPointer: '',
+            rel: 'author',
+            attachmentPointer: '',
+            hrefInputTemplates: ['/authors/{author}/{extra}'],
+            hrefFixedInput: {},
+            hrefPrepopulatedInput: {
+              author: 'Martin',
+              extra: undefined,
+            },
+          },
+        ]);
+      });
+
+      it('provides a function for fully templating the template', function () {
+        var resolved = resolver.resolve(
+          {
+            links: [
+              {
+                rel: 'author',
+                href: '/authors/{author}/{extra}',
+                hrefSchema: {
+                  properties: {
+                    author: true,
+                    extra: true,
+                  },
+                },
+              },
+            ],
+          },
+          {
+            author: 'Martin',
+          },
+          'https://example.com'
+        );
+
+        expect(resolved[0].fillHref).to.be.a('function');
+      });
+
+      it('does not allow input if schema is false', function () {
+        var resolved = resolver.resolve(
+          {
+            links: [
+              {
+                rel: 'author',
+                href: '/authors/{author}/{extra}',
+                hrefSchema: {
+                  properties: {
+                    author: false,
+                    extra: true,
+                  },
+                },
+              },
+            ],
+          },
+          {
+            author: 'Martin',
+          },
+          'https://example.com'
+        );
+
+        expect(resolved[0].fillHref).to.be.a('function');
 
         var targetUri = resolved[0].fillHref({
           author: 'I should not be used',
-          extra: 'I should be used'
-        })
+          extra: 'I should be used',
+        });
 
-        expect(targetUri).to.equal('/authors/Martin/' + encodeURIComponent('I should be used'))
-        expect(targetUri).to.equal(resolved[0].targetUri)
-      })
-    })
-  })
+        expect(targetUri).to.equal(
+          '/authors/Martin/' + encodeURIComponent('I should be used')
+        );
+        expect(targetUri).to.equal(resolved[0].targetUri);
+      });
+    });
+  });
 
-  describe('resolve with subschema links', function() {
-    var schema
-    var data
-    beforeEach(function() {
+  describe('resolve with subschema links', function () {
+    var schema;
+    var data;
+    beforeEach(function () {
       schema = {
         type: 'object',
         required: ['elements'],
@@ -404,92 +502,120 @@ describe('resolver', function() {
           elements: {
             type: 'array',
             items: {
-              links: [{
-                anchorPointer: '',
-                rel: 'item',
-                href: 'things/{id}'
-              }]
-            }
-          }
+              links: [
+                {
+                  anchorPointer: '',
+                  rel: 'item',
+                  href: 'things/{id}',
+                },
+              ],
+            },
+          },
         },
-        links: [{
-          rel: 'self',
-          href: ''
-        }]
-      }
+        links: [
+          {
+            rel: 'self',
+            href: '',
+          },
+        ],
+      };
 
       data = {
-        elements: [{
-          id: 12345,
-          data: {}
-        }, {
-          id: 67890,
-          data: {}
-        }]
-      }
-    })
+        elements: [
+          {
+            id: 12345,
+            data: {},
+          },
+          {
+            id: 67890,
+            data: {},
+          },
+        ],
+      };
+    });
 
-    it('resolves item links', function() {
-      var resolved = resolver.resolve(schema, data, 'https://api.example.com/things')
+    it('resolves item links', function () {
+      var resolved = resolver.resolve(
+        schema,
+        data,
+        'https://api.example.com/things'
+      );
 
-      expect(resolved).to.eql([{
-        contextUri: 'https://api.example.com/things',
-        contextPointer: '',
-        rel: 'self',
-        targetUri: 'https://api.example.com/things',
-        attachmentPointer: ''
-      }, {
-        contextUri: 'https://api.example.com/things',
-        contextPointer: '',
-        rel: 'item',
-        targetUri: 'https://api.example.com/things/12345',
-        attachmentPointer: '/elements/0'
-      }, {
-        contextUri: 'https://api.example.com/things',
-        contextPointer: '',
-        rel: 'item',
-        targetUri: 'https://api.example.com/things/67890',
-        attachmentPointer: '/elements/1'
-      }])
-    })
+      expect(resolved).to.eql([
+        {
+          contextUri: 'https://api.example.com/things',
+          contextPointer: '',
+          rel: 'self',
+          targetUri: 'https://api.example.com/things',
+          attachmentPointer: '',
+        },
+        {
+          contextUri: 'https://api.example.com/things',
+          contextPointer: '',
+          rel: 'item',
+          targetUri: 'https://api.example.com/things/12345',
+          attachmentPointer: '/elements/0',
+        },
+        {
+          contextUri: 'https://api.example.com/things',
+          contextPointer: '',
+          rel: 'item',
+          targetUri: 'https://api.example.com/things/67890',
+          attachmentPointer: '/elements/1',
+        },
+      ]);
+    });
 
-    it('resolves when item is array', function() {
+    it('resolves when item is array', function () {
       schema = {
         type: 'object',
         required: ['elements'],
         properties: {
           elements: {
             type: 'array',
-            items: [{
-              links: [{
-                anchorPointer: '',
-                rel: 'item',
-                href: 'things/{id}'
-              }]
-            }]
-          }
+            items: [
+              {
+                links: [
+                  {
+                    anchorPointer: '',
+                    rel: 'item',
+                    href: 'things/{id}',
+                  },
+                ],
+              },
+            ],
+          },
         },
-        links: [{
+        links: [
+          {
+            rel: 'self',
+            href: '',
+          },
+        ],
+      };
+
+      var resolved = resolver.resolve(
+        schema,
+        data,
+        'https://api.example.com/things'
+      );
+
+      expect(resolved).to.eql([
+        {
+          contextUri: 'https://api.example.com/things',
+          contextPointer: '',
           rel: 'self',
-          href: ''
-        }]
-      }
-
-      var resolved = resolver.resolve(schema, data, 'https://api.example.com/things')
-
-      expect(resolved).to.eql([{
-        contextUri: 'https://api.example.com/things',
-        contextPointer: '',
-        rel: 'self',
-        targetUri: 'https://api.example.com/things',
-        attachmentPointer: ''
-      }, {
-        contextUri: 'https://api.example.com/things',
-        contextPointer: '',
-        rel: 'item',
-        targetUri: 'https://api.example.com/things/12345',
-        attachmentPointer: '/elements/0'
-      }])
-    })
-  })
-})
+          targetUri: 'https://api.example.com/things',
+          attachmentPointer: '',
+        },
+        {
+          contextUri: 'https://api.example.com/things',
+          contextPointer: '',
+          rel: 'item',
+          targetUri: 'https://api.example.com/things/12345',
+          attachmentPointer: '/elements/0',
+        },
+      ]);
+    });
+  });
+});
