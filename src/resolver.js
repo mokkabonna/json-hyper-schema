@@ -1,6 +1,6 @@
 //convert all to import from statements
 import uriTemplates from 'uri-templates';
-import { resolve } from './relative-json-pointer.js';
+import { resolveRelativeJsonPointer } from './relative-json-pointer.js';
 import { extractSchemas } from './extract-sub-schema.js';
 import jsonPointer from 'json-pointer';
 import traverse from 'json-schema-traverse';

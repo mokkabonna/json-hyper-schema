@@ -1,6 +1,6 @@
 import pointer from 'json-pointer';
 
-function resolve(data, base, relative) {
+function resolveRelativeJsonPointer(data, base, relative) {
   var tokens = pointer.parse(base);
   var parts = /^([\d]+)(.+)?/.exec(relative);
   var prefix = parseInt(parts[1], 10);
@@ -38,4 +38,4 @@ function resolve(data, base, relative) {
   }
 }
 
-export { resolve };
+export { resolveRelativeJsonPointer };
