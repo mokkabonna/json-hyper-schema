@@ -10,9 +10,23 @@ import pointer from 'json-pointer';
  */
 function resolveRelativeJsonPointer(data, basePointer, relative) {
   var tokens = pointer.parse(basePointer);
-  var parts = /^([\d]+)(.+)?/.exec(relative);
-  var prefix = parseInt(parts[1], 10);
-  var relPointer = parts[2];
+  var match =
+    /^(?<number>(?<zero>[0])?(?<nonzero>[1-9]([0-9]+)?)?)(?<rest>.+)?/.exec(
+      relative
+    );
+
+  if (
+    !match ||
+    (match.groups.zero && match.groups.nonzero) || // cant have both 0 and non zero
+    !match.groups.number // must have a number
+  ) {
+    throw new Error(
+      'Invalid relative pointer. Must start with either 0 or a number >= 1 with non leading zeros.'
+    );
+  }
+
+  var prefix = parseInt(match.groups.number, 10);
+  var relPointer = match.groups.rest;
 
   if (prefix > tokens.length || (prefix >= tokens.length && tokens[0] === '')) {
     throw new Error('Trying to reference value above root.');
