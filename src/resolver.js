@@ -15,10 +15,18 @@ const ajv = new Ajv();
 const isRelative = jsonPointer => /^\d+/.test(jsonPointer);
 const isFalse = s => s === false;
 
-function getTemplateData(template, link, instance) {
-  var parsedTemplate = uriTemplates(template);
-  var templatePointers = link.templatePointers || {};
-  var attachmentPointer = link.attachmentPointer || '';
+/**
+ *
+ * Returns the data for a template given the provided link description object and instance data
+ * @param {*} uriTemplate the uri template
+ * @param {*} ldo the resolved "Link Description Object"
+ * @param {*} instance the instance data
+ * @returns
+ */
+function getTemplateData({ uriTemplate, ldo, instance }) {
+  var parsedTemplate = uriTemplates(uriTemplate);
+  var templatePointers = ldo.templatePointers ?? {};
+  var attachmentPointer = ldo.attachmentPointer ?? '';
 
   var result = parsedTemplate.varNames.reduce(function (all, name) {
     name = decodeURIComponent(name);
@@ -28,7 +36,11 @@ function getTemplateData(template, link, instance) {
       valuePointer = templatePointers[name];
       if (isRelative(valuePointer)) {
         try {
-          all[name] = resolve(instance, attachmentPointer, valuePointer);
+          all[name] = resolveRelativeJsonPointer(
+            instance,
+            attachmentPointer,
+            valuePointer
+          );
         } catch (e) {
           // Ignore for now
         }

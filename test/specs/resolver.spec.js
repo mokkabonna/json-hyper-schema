@@ -20,105 +20,156 @@ describe('resolver', function () {
 
   describe('getTemplateData', function () {
     it('returns empty object when no templated parts', function () {
-      var result = getTemplateData(link.href, link, data);
+      var result = getTemplateData({
+        uriTemplate: link.href,
+        ldo: link,
+        instance: {},
+      });
       expect(result).to.eql({});
     });
 
     it('returns data from instance when templated', function () {
-      var result = getTemplateData(
-        '/products/{id%28}',
-        {
+      var result = getTemplateData({
+        uriTemplate: '/products/{id%28}',
+        ldo: {
           rel: 'self',
           href: 'notImportant',
         },
-        {
+        instance: {
           'id(': 7,
-        }
-      );
+        },
+      });
       expect(result).to.eql({
         'id(': 7,
       });
     });
 
     it('returns empty if not existing in the template', function () {
-      var result = getTemplateData(
-        '/products/{id%28}',
-        {
+      var result = getTemplateData({
+        uriTemplate: '/products/{id%28}',
+        ldo: {
           rel: 'self',
           href: 'notImportant',
         },
-        {}
-      );
+        instance: {},
+      });
       expect(result).to.eql({});
     });
 
-    it('supports absoute templatePointers', function () {
-      var result = getTemplateData(
-        '/products/{id}',
-        {
+    it('supports absolute templatePointers', function () {
+      var result = getTemplateData({
+        uriTemplate: '/products/{id}',
+        ldo: {
           rel: 'self',
           href: 'notImportant',
           templatePointers: {
             id: '/child/id',
           },
         },
-        {
+        instance: {
           id: 8,
           child: {
             id: 9,
           },
-        }
-      );
+        },
+      });
       expect(result).to.eql({
         id: 9,
       });
     });
 
+    it('returns all values', () => {
+      var result = getTemplateData({
+        uriTemplate: '/products/{id}/child/{childId}',
+        ldo: {
+          rel: 'self',
+          href: 'notImportant',
+          templatePointers: {
+            childId: '/child/id',
+          },
+        },
+        instance: {
+          id: 8,
+          child: {
+            id: 9,
+          },
+        },
+      });
+
+      expect(result).to.eql({
+        id: 8,
+        childId: 9,
+      });
+    });
+
     it('supports relative templatePointers', function () {
-      var result = getTemplateData(
-        '/products/{id}',
-        {
+      var result = getTemplateData({
+        uriTemplate: '/products/{id}',
+        ldo: {
           rel: 'self',
           href: 'notImportant',
           templatePointers: {
             id: '0/child/id',
           },
         },
-        {
+        instance: {
           id: 8,
           child: {
             id: 9,
-          },
-        }
-      );
-      expect(result).to.eql({
-        id: 9,
-      });
-
-      result = getTemplateData(
-        '/products/{id}',
-        {
-          rel: 'self',
-          href: 'notImportant',
-          attachmentPointer: '/child/id',
-          templatePointers: {
-            id: '2/child/id',
           },
         },
-        {
-          id: 8,
-          child: {
-            id: 9,
-          },
-        }
-      );
+      });
       expect(result).to.eql({
         id: 9,
       });
 
-      result = getTemplateData(
-        '/products/{id}',
-        {
+      result = getTemplateData({
+        uriTemplate: '/products/{id}',
+        ldo: {
+          rel: 'self',
+          href: 'notImportant',
+          attachmentPointer: '/child/arr/2',
+          templatePointers: {
+            id: '3/child/id',
+          },
+        },
+        instance: {
+          id: 8,
+          child: {
+            id: 9,
+            arr: [1, 2, 3],
+          },
+        },
+      });
+      expect(result).to.eql({
+        id: 9,
+      });
+
+      result = getTemplateData({
+        uriTemplate: '/products/{id}',
+        ldo: {
+          rel: 'self',
+          href: 'notImportant',
+          attachmentPointer: '/child/arr/2',
+          templatePointers: {
+            id: '1/1',
+          },
+        },
+        instance: {
+          id: 8,
+          child: {
+            id: 9,
+            arr: [1, 2, 3],
+          },
+        },
+      });
+      expect(result).to.eql({
+        id: 2,
+      });
+
+      result = getTemplateData({
+        uriTemplate: '/products/{id}',
+        ldo: {
           rel: 'self',
           href: 'notImportant',
           attachmentPointer: '/child/id',
@@ -126,13 +177,13 @@ describe('resolver', function () {
             id: '2/id',
           },
         },
-        {
+        instance: {
           id: 8,
           child: {
             id: 9,
           },
-        }
-      );
+        },
+      });
       expect(result).to.eql({
         id: 8,
       });
