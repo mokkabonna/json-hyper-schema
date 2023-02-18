@@ -3,7 +3,7 @@ import uriTemplates from 'uri-templates';
 import { resolveRelativeJsonPointer } from './relative-json-pointer.js';
 import { extractSchemas } from './extract-sub-schema.js';
 import jsonPointer from 'json-pointer';
-import traverse from 'json-schema-traverse';
+import traverseSchema from 'json-schema-traverse';
 import URI from 'uri-js';
 import Ajv from 'ajv';
 import { merge, omit } from 'lodash-es';
@@ -176,7 +176,7 @@ function createLink(ldo, pointer, parentPointer, parentKeyWord) {
 function getAllSchemaLinks(schema) {
   var links = [];
 
-  traverse(
+  traverseSchema(
     schema,
     function (subSchema, pointer, root, parentPointer, parentKeyWord) {
       links = links.concat(
