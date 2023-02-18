@@ -9,13 +9,13 @@ const isArray = Array.isArray;
 
 function extractSchemas(schema, jsonPointer, options) {
   options = options || {};
-  var tokens = pointer.parse(jsonPointer);
-  var lastToken = tokens[tokens.length - 1];
-  var newSchema = {};
-  var hasPatternProperty = false;
+  const tokens = pointer.parse(jsonPointer);
+  const lastToken = tokens[tokens.length - 1];
+  const newSchema = {};
+  const hasPatternProperty = false;
 
   attempt(function () {
-    var subSchema = pointer.get(schema, jsonPointer);
+    const subSchema = pointer.get(schema, jsonPointer);
     if (subSchema === false) {
       newSchema = false;
     } else {
@@ -23,9 +23,9 @@ function extractSchemas(schema, jsonPointer, options) {
     }
   });
 
-  var hasPlainProperty = isNotEmptyObject(newSchema);
+  const hasPlainProperty = isNotEmptyObject(newSchema);
 
-  var schemaArrays = ['allOf', 'oneOf', 'anyOf'];
+  const schemaArrays = ['allOf', 'oneOf', 'anyOf'];
 
   schemaArrays.forEach(function (name) {
     if (has(schema, name)) {
@@ -42,7 +42,7 @@ function extractSchemas(schema, jsonPointer, options) {
   }
 
   if (has(schema, 'patternProperties')) {
-    var patternSchemas = reduce(
+    const patternSchemas = reduce(
       schema.patternProperties,
       function (all, schema, key) {
         if (new RegExp(key).test(lastToken)) {
@@ -70,7 +70,7 @@ function extractSchemas(schema, jsonPointer, options) {
   }
 
   if (has(schema, 'dependencies') && isArray(options.presentKeys)) {
-    var dependencySchemas = options.presentKeys.reduce(function (all, key) {
+    const dependencySchemas = options.presentKeys.reduce(function (all, key) {
       if (has(schema.dependencies, key)) {
         all.push(extractSchemas(schema.dependencies[key], jsonPointer));
       }

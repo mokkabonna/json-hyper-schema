@@ -7,8 +7,8 @@ import {
 import _ from 'lodash';
 
 describe('resolver', function () {
-  var link;
-  var data;
+  let link;
+  let data;
 
   beforeEach(function () {
     link = {
@@ -20,7 +20,7 @@ describe('resolver', function () {
 
   describe('getTemplateData', function () {
     it('returns empty object when no templated parts', function () {
-      var result = getTemplateData({
+      const result = getTemplateData({
         uriTemplate: link.href,
         ldo: link,
         instance: {},
@@ -29,7 +29,7 @@ describe('resolver', function () {
     });
 
     it('returns data from instance when templated', function () {
-      var result = getTemplateData({
+      const result = getTemplateData({
         uriTemplate: '/products/{id%28}',
         ldo: {
           rel: 'self',
@@ -45,7 +45,7 @@ describe('resolver', function () {
     });
 
     it('returns empty if not existing in the template', function () {
-      var result = getTemplateData({
+      const result = getTemplateData({
         uriTemplate: '/products/{id%28}',
         ldo: {
           rel: 'self',
@@ -57,7 +57,7 @@ describe('resolver', function () {
     });
 
     it('supports absolute templatePointers', function () {
-      var result = getTemplateData({
+      const result = getTemplateData({
         uriTemplate: '/products/{id}',
         ldo: {
           rel: 'self',
@@ -79,7 +79,7 @@ describe('resolver', function () {
     });
 
     it('returns all values', () => {
-      var result = getTemplateData({
+      const result = getTemplateData({
         uriTemplate: '/products/{id}/child/{childId}',
         ldo: {
           rel: 'self',
@@ -103,7 +103,7 @@ describe('resolver', function () {
     });
 
     it('supports relative templatePointers', function () {
-      var result = getTemplateData({
+      let result = getTemplateData({
         uriTemplate: '/products/{id}',
         ldo: {
           rel: 'self',
@@ -192,7 +192,7 @@ describe('resolver', function () {
 
   describe('getDefaultInputValues', function () {
     it('gets an object with the default values set', function () {
-      var result = getDefaultInputValues(
+      const result = getDefaultInputValues(
         '/products/{id}',
         {
           rel: 'self',
@@ -217,7 +217,7 @@ describe('resolver', function () {
     });
 
     it('does not include values if not valid (but sets undefined)', function () {
-      var result = getDefaultInputValues(
+      const result = getDefaultInputValues(
         '/products/{id}',
         {
           rel: 'self',
@@ -242,7 +242,7 @@ describe('resolver', function () {
     });
 
     it('excludes properties with with false set in subschema', function () {
-      var result = getDefaultInputValues(
+      let result = getDefaultInputValues(
         '/products/{id}',
         {
           rel: 'self',
@@ -287,7 +287,7 @@ describe('resolver', function () {
     });
 
     it('return empty object if no input allowed', function () {
-      var result = getDefaultInputValues(
+      const result = getDefaultInputValues(
         '/products/{id}',
         {
           rel: 'self',
@@ -304,7 +304,7 @@ describe('resolver', function () {
   });
 
   describe('resolve with simple schema', function () {
-    var schema;
+    let schema;
     beforeEach(function () {
       schema = {
         $id: 'https://schema.example.com/entry',
@@ -325,7 +325,7 @@ describe('resolver', function () {
 
     describe('not accepting input', function () {
       it('resolves non templated uris', function () {
-        var resolved = resolveLinks(schema, data, 'https://api.example.com');
+        const resolved = resolveLinks(schema, data, 'https://api.example.com');
 
         expect(resolved).to.eql([
           {
@@ -346,7 +346,7 @@ describe('resolver', function () {
       });
 
       it('resolves links with data from instance if not accepting input', function () {
-        var resolved = resolveLinks(
+        const resolved = resolveLinks(
           {
             links: [
               {
@@ -373,7 +373,7 @@ describe('resolver', function () {
       });
 
       it('does not set targetUri when it cannot be used', function () {
-        var resolved = resolveLinks(
+        const resolved = resolveLinks(
           {
             links: [
               {
@@ -403,7 +403,7 @@ describe('resolver', function () {
 
     describe('accepting input', function () {
       it('resolves values that does not allow input', function () {
-        var resolved = resolveLinks(
+        const resolved = resolveLinks(
           {
             links: [
               {
@@ -442,7 +442,7 @@ describe('resolver', function () {
       });
 
       it('allows overriding prepopulated input', function () {
-        var resolved = resolveLinks(
+        const resolved = resolveLinks(
           {
             links: [
               {
@@ -480,7 +480,7 @@ describe('resolver', function () {
       });
 
       it('provides a function for fully templating the template', function () {
-        var resolved = resolveLinks(
+        const resolved = resolveLinks(
           {
             links: [
               {
@@ -505,7 +505,7 @@ describe('resolver', function () {
       });
 
       it('does not allow input if schema is false', function () {
-        var resolved = resolveLinks(
+        const resolved = resolveLinks(
           {
             links: [
               {
@@ -528,7 +528,7 @@ describe('resolver', function () {
 
         expect(resolved[0].fillHref).to.be.a('function');
 
-        var targetUri = resolved[0].fillHref({
+        const targetUri = resolved[0].fillHref({
           author: 'I should not be used',
           extra: 'I should be used',
         });
@@ -542,8 +542,8 @@ describe('resolver', function () {
   });
 
   describe('resolve with subschema links', function () {
-    var schema;
-    var data;
+    let schema;
+    let data;
     beforeEach(function () {
       schema = {
         type: 'object',
@@ -585,7 +585,7 @@ describe('resolver', function () {
     });
 
     it('resolves item links', function () {
-      var resolved = resolveLinks(
+      const resolved = resolveLinks(
         schema,
         data,
         'https://api.example.com/things'
@@ -644,7 +644,7 @@ describe('resolver', function () {
         ],
       };
 
-      var resolved = resolveLinks(
+      const resolved = resolveLinks(
         schema,
         data,
         'https://api.example.com/things'

@@ -56,7 +56,7 @@ const client = {
   get: function(uri) {
     return fetch(uri).then(r => {
       return r.text().then(function(text) {
-        var result = {
+        const result = {
           meta: {
             statusCode: r.status
 
@@ -68,7 +68,7 @@ const client = {
           result.meta[name] = val
         })
 
-        var isJSON = /application\/(.+)?json/.test(r.headers.get('content-type'))
+        const isJSON = /application\/(.+)?json/.test(r.headers.get('content-type'))
 
         if (isJSON) {
           result.isJSON = true
@@ -84,7 +84,7 @@ const client = {
           result.body = text
         }
 
-        var header = r.headers.get('link')
+        const header = r.headers.get('link')
         if (header) {
           result.links = LinkHeader.parse(header).refs
         }
@@ -174,7 +174,7 @@ export default {
       })
     },
     fetchSchemas: function(resource) {
-      var descriptions = resource.links.filter(l => l.rel === 'describedBy')
+      const descriptions = resource.links.filter(l => l.rel === 'describedBy')
       return Promise.all(descriptions.map((desc) => {
         return fetch(desc.uri).then(r => r.json())
       }))

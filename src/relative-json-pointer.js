@@ -9,8 +9,8 @@ import pointer from 'json-pointer';
  * @returns the value located at the relative pointer location
  */
 function resolveRelativeJsonPointer(data, basePointer, relative) {
-  var tokens = pointer.parse(basePointer);
-  var match =
+  const tokens = pointer.parse(basePointer);
+  const match =
     /^(?<number>(?<zero>[0])?(?<nonzero>[1-9]([0-9]+)?)?)(?<rest>.+)?/.exec(
       relative
     );
@@ -25,22 +25,22 @@ function resolveRelativeJsonPointer(data, basePointer, relative) {
     );
   }
 
-  var prefix = parseInt(match.groups.number, 10);
-  var relPointer = match.groups.rest;
+  const prefix = parseInt(match.groups.number, 10);
+  const relPointer = match.groups.rest;
 
   if (prefix > tokens.length || (prefix >= tokens.length && tokens[0] === '')) {
     throw new Error('Trying to reference value above root.');
   }
 
-  tokens = tokens.slice(0, tokens.length - prefix);
+  const relativeTokens = tokens.slice(0, tokens.length - prefix);
 
   if (relPointer === '#') {
-    if (tokens[0] === '') {
+    if (relativeTokens[0] === '') {
       throw new Error('Tring to get key of root. It does not have a key.');
     }
 
-    let propOrIndex = tokens.pop();
-    let newPointer = pointer.compile(tokens);
+    let propOrIndex = relativeTokens.pop();
+    let newPointer = pointer.compile(relativeTokens);
     let parentValue = pointer.get(data, newPointer);
     if (Array.isArray(parentValue)) {
       return parseInt(propOrIndex, 10);
@@ -48,7 +48,7 @@ function resolveRelativeJsonPointer(data, basePointer, relative) {
       return propOrIndex;
     }
   } else {
-    let newPointer = pointer.compile(tokens);
+    let newPointer = pointer.compile(relativeTokens);
 
     newPointer = newPointer + (relPointer || '');
 

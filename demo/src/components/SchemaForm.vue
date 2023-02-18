@@ -10,8 +10,8 @@
 </form>
 </template>
 <script>
-var res
-var prom = new Promise(function(resolve) {
+const res
+const prom = new Promise(function(resolve) {
   res = resolve
 })
 export default {

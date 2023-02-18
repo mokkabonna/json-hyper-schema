@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { resolveRelativeJsonPointer } from '../../src/relative-json-pointer.js';
 
 describe('relative json pointer util', function () {
-  var data;
+  let data;
   beforeEach(function () {
     data = {
       foo: ['bar', 'baz'],

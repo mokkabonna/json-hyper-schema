@@ -24,13 +24,13 @@ const isFalse = s => s === false;
  * @returns
  */
 function getTemplateData({ uriTemplate, ldo, instance }) {
-  var parsedTemplate = uriTemplates(uriTemplate);
-  var templatePointers = ldo.templatePointers ?? {};
-  var attachmentPointer = ldo.attachmentPointer ?? '';
+  const parsedTemplate = uriTemplates(uriTemplate);
+  const templatePointers = ldo.templatePointers ?? {};
+  const attachmentPointer = ldo.attachmentPointer ?? '';
 
-  var result = parsedTemplate.varNames.reduce(function (all, name) {
+  const result = parsedTemplate.varNames.reduce(function (all, name) {
     name = decodeURIComponent(name);
-    var valuePointer;
+    let valuePointer;
 
     if (has(templatePointers, name)) {
       valuePointer = templatePointers[name];
@@ -87,15 +87,15 @@ function simplify(schema) {
 }
 
 function getDefaultInputValues(template, link, instance) {
-  var templateData = getTemplateData(template, link, instance);
-  var parsedTemplate = uriTemplates(template);
+  const templateData = getTemplateData(template, link, instance);
+  const parsedTemplate = uriTemplates(template);
 
   if (link.hrefSchema === false || !has(link, 'hrefSchema')) {
     return {};
   }
 
-  var defaultData = parsedTemplate.varNames.reduce(function (all, name) {
-    var subSchema = extractSchemas(link.hrefSchema, '/properties/' + name);
+  const defaultData = parsedTemplate.varNames.reduce(function (all, name) {
+    const subSchema = extractSchemas(link.hrefSchema, '/properties/' + name);
 
     if (simplify(subSchema) !== false) {
       all[name] = undefined;
@@ -134,12 +134,12 @@ function resolveLink(config, instance, instanceUri, attachmentPointer) {
     );
 
     resolved.fillHref = function (userSupplied) {
-      var fixedData = omit(
+      const fixedData = omit(
         getTemplateData(ldo.href, ldo, instance),
         Object.keys(resolved.hrefPrepopulatedInput)
       );
-      var allData = merge({}, userSupplied, fixedData);
-      var template = uriTemplates(ldo.href);
+      const allData = merge({}, userSupplied, fixedData);
+      const template = uriTemplates(ldo.href);
       resolved.targetUri = template.fill(allData);
       return resolved.targetUri;
     };
@@ -174,13 +174,13 @@ function createLink(ldo, pointer, parentPointer, parentKeyWord) {
 }
 
 function getAllSchemaLinks(schema) {
-  var links = [];
+  const links = [];
 
   traverseSchema(
     schema,
     function (subSchema, pointer, root, parentPointer, parentKeyWord) {
-      links = links.concat(
-        (subSchema.links || []).map(l =>
+      links.push(
+        ...(subSchema.links || []).map(l =>
           createLink(l, pointer, parentPointer, parentKeyWord)
         )
       );
@@ -195,9 +195,9 @@ function schemaToInstancePointer(pointer) {
 }
 
 function resolveLinks(schema, instance, instanceUri) {
-  var links = getAllSchemaLinks(schema);
+  const links = getAllSchemaLinks(schema);
 
-  var resolvedLinks = links.reduce(function (all, config) {
+  const resolvedLinks = links.reduce(function (all, config) {
     if (config.parentKeyWord === 'items' && config.lastPointer !== 'items') {
       let dataPointer = schemaToInstancePointer(config.schemaPointer);
       all.push(

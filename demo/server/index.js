@@ -7,7 +7,7 @@ const app = express();
 app.use('/api/static', express.static('static'));
 app.use(bodyParser.json());
 
-var things = {
+const things = {
   elements: [
     {
       id: 12345,
@@ -21,7 +21,7 @@ var things = {
 };
 
 app.get('/api', function (req, res) {
-  var links = {
+  const links = {
     describedBy: {
       rel: 'describedBy',
       url: '/api/static/root.json',
@@ -39,7 +39,7 @@ app.post('/api/things', function (req, res) {
 });
 
 app.get('/api/things', function (req, res) {
-  var links = {
+  const links = {
     describedBy: {
       rel: 'describedBy',
       url: '/api/static/things.json',
@@ -50,7 +50,7 @@ app.get('/api/things', function (req, res) {
 });
 
 app.get('/api/things/:id', function (req, res) {
-  var links = {
+  const links = {
     describedBy: {
       rel: 'describedBy',
       url: '/api/static/thing.json',
@@ -58,7 +58,7 @@ app.get('/api/things/:id', function (req, res) {
   };
   res.set('link', formatter(links));
 
-  var element = things.elements.find(e => e.id === parseInt(req.params.id));
+  const element = things.elements.find(e => e.id === parseInt(req.params.id));
   res.send(element);
 });
 
