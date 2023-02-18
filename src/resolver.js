@@ -1,115 +1,13 @@
 //convert all to import from statements
 import uriTemplates from 'uri-templates';
-import { resolveRelativeJsonPointer } from './relative-json-pointer.js';
-import { extractSchemas } from './extract-sub-schema.js';
 import jsonPointer from 'json-pointer';
 import traverseSchema from 'json-schema-traverse';
 import URI from 'uri-js';
-import Ajv from 'ajv';
 import { merge, omit } from 'lodash-es';
+import { getTemplateData } from './get-template-data.js';
+import { getDefaultInputValues } from './get-default-input-values.js';
 
 const has = Reflect.has;
-
-const ajv = new Ajv();
-
-const isRelative = jsonPointer => /^\d+/.test(jsonPointer);
-const isFalse = s => s === false;
-
-/**
- *
- * Returns the data for a template given the provided link description object and instance data
- * @param {*} uriTemplate the uri template
- * @param {*} ldo the resolved "Link Description Object"
- * @param {*} instance the instance data
- * @returns
- */
-function getTemplateData({ uriTemplate, ldo, instance }) {
-  const parsedTemplate = uriTemplates(uriTemplate);
-  const templatePointers = ldo.templatePointers ?? {};
-  const attachmentPointer = ldo.attachmentPointer ?? '';
-
-  const result = parsedTemplate.varNames.reduce(function (all, name) {
-    name = decodeURIComponent(name);
-    let valuePointer;
-
-    if (has(templatePointers, name)) {
-      valuePointer = templatePointers[name];
-      if (isRelative(valuePointer)) {
-        try {
-          all[name] = resolveRelativeJsonPointer(
-            instance,
-            attachmentPointer,
-            valuePointer
-          );
-        } catch (e) {
-          // Ignore for now
-        }
-      } else {
-        attemptSet();
-      }
-    } else {
-      valuePointer = attachmentPointer + '/' + name;
-      attemptSet();
-    }
-
-    function attemptSet() {
-      try {
-        all[name] = jsonPointer.get(instance, valuePointer);
-      } catch (e) {
-        // Ignore for now
-      }
-    }
-
-    return all;
-  }, {});
-
-  return result;
-}
-
-function simplify(schema) {
-  if (schema === false) {
-    return false;
-  }
-
-  if (Array.isArray(schema.allOf) && schema.allOf.some(isFalse)) {
-    return false;
-  }
-
-  if (Array.isArray(schema.anyOf) && schema.anyOf.every(isFalse)) {
-    return false;
-  }
-
-  if (Array.isArray(schema.oneOf) && schema.oneOf.every(isFalse)) {
-    return false;
-  }
-
-  return schema;
-}
-
-function getDefaultInputValues(template, link, instance) {
-  const templateData = getTemplateData(template, link, instance);
-  const parsedTemplate = uriTemplates(template);
-
-  if (link.hrefSchema === false || !has(link, 'hrefSchema')) {
-    return {};
-  }
-
-  const defaultData = parsedTemplate.varNames.reduce(function (all, name) {
-    const subSchema = extractSchemas(link.hrefSchema, '/properties/' + name);
-
-    if (simplify(subSchema) !== false) {
-      all[name] = undefined;
-    }
-
-    if (ajv.validate(subSchema, templateData[name])) {
-      all[name] = templateData[name];
-    }
-
-    return all;
-  }, {});
-
-  return defaultData;
-}
 
 function resolveLink(config, instance, instanceUri, attachmentPointer) {
   let ldo = config.ldo;
@@ -133,11 +31,14 @@ function resolveLink(config, instance, instanceUri, attachmentPointer) {
       Object.keys(resolved.hrefPrepopulatedInput)
     );
 
+    // a function that will fill the href template with the provided data
     resolved.fillHref = function (userSupplied) {
       const fixedData = omit(
         getTemplateData(ldo.href, ldo, instance),
         Object.keys(resolved.hrefPrepopulatedInput)
       );
+      // merge the user supplied data with the fixed data
+      // prefer the fixed data
       const allData = merge({}, userSupplied, fixedData);
       const template = uriTemplates(ldo.href);
       resolved.targetUri = template.fill(allData);
@@ -230,4 +131,4 @@ function resolveLinks(schema, instance, instanceUri) {
   }, []);
   return resolvedLinks;
 }
-export { getDefaultInputValues, getTemplateData, resolveLinks };
+export { resolveLinks };
