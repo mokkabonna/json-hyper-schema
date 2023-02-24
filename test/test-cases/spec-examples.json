@@ -1,0 +1,43 @@
+[
+  {
+    "description": "Spec examples",
+    "tests": [
+      {
+        "description": "Entry point links, no templates. Example in 9.1",
+        "instanceUri": "https://example.com/api",
+        "schema": {
+          "$id": "https://schema.example.com/entry",
+          "$schema": "https://json-schema.org/draft/2019-09/hyper-schema",
+          "base": "https://example.com/api/",
+          "links": [
+            {
+              "rel": "self",
+              "href": "../api"
+            },
+            {
+              "rel": "about",
+              "href": "docs"
+            }
+          ]
+        },
+        "instanceData": {},
+        "resolvedLinks": [
+          {
+            "contextUri": "https://example.com/api",
+            "contextPointer": "",
+            "rel": "self",
+            "targetUri": "https://example.com/api",
+            "attachmentPointer": ""
+          },
+          {
+            "contextUri": "https://example.com/api",
+            "contextPointer": "",
+            "rel": "about",
+            "targetUri": "https://example.com/api/docs",
+            "attachmentPointer": ""
+          }
+        ]
+      }
+    ]
+  }
+]

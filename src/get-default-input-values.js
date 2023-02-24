@@ -1,5 +1,5 @@
 import uriTemplates from 'uri-templates';
-import { extractSchemas } from './extract-sub-schema.js';
+import { extractSubSchemas } from './extract-sub-schema.js';
 import { getTemplateData } from './get-template-data.js';
 
 const isFalse = s => s === false;
@@ -50,7 +50,10 @@ function getTemplateVariableInfoFromInstance(ldo, instance) {
 
   return Object.fromEntries(
     parsedTemplate.varNames.map(name => {
-      const subSchema = extractSchemas(ldo.hrefSchema, '/properties/' + name);
+      const subSchema = extractSubSchemas(
+        ldo.hrefSchema,
+        '/properties/' + name
+      );
       const value = templateData[name];
 
       return [

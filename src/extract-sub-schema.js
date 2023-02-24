@@ -15,7 +15,7 @@ const isArray = Array.isArray;
  * @param {*} options
  * @returns
  */
-function extractSchemas(schema, jsonPointer, options) {
+function extractSubSchemas(schema, jsonPointer, options) {
   options = options || {};
   const tokens = pointer.parse(jsonPointer);
   const lastToken = tokens[tokens.length - 1];
@@ -39,14 +39,14 @@ function extractSchemas(schema, jsonPointer, options) {
     if (has(schema, name)) {
       newSchema[name] = schema[name]
         .map(function (arraySchema) {
-          return extractSchemas(arraySchema, jsonPointer);
+          return extractSubSchemas(arraySchema, jsonPointer);
         })
         .filter(isRestrictingSchema);
     }
   });
 
   if (has(schema, 'not')) {
-    newSchema.not = extractSchemas(schema.not, jsonPointer);
+    newSchema.not = extractSubSchemas(schema.not, jsonPointer);
   }
 
   if (has(schema, 'patternProperties')) {
@@ -82,7 +82,7 @@ function extractSchemas(schema, jsonPointer, options) {
   if (has(schema, 'dependentSchemas') && isArray(options.presentKeys)) {
     const dependencySchemas = options.presentKeys.reduce(function (all, key) {
       if (has(schema.dependencySchemas, key)) {
-        all.push(extractSchemas(schema.dependencySchemas[key], jsonPointer));
+        all.push(extractSubSchemas(schema.dependencySchemas[key], jsonPointer));
       }
       return all;
     }, []);
@@ -93,4 +93,4 @@ function extractSchemas(schema, jsonPointer, options) {
   return newSchema;
 }
 
-export { extractSchemas };
+export { extractSubSchemas };

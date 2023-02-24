@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import _ from 'lodash';
 import { getTemplateVariableInfoFromInstance } from '../../src/get-default-input-values.js';
 
-describe.only('getTemplateVariableInfoFromInstance', function () {
+describe('getTemplateVariableInfoFromInstance', function () {
   it('returns no value if not in instance', function () {
     const result = getTemplateVariableInfoFromInstance(
       {

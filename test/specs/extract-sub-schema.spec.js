@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { extractSchemas } from '../../src/extract-sub-schema.js';
+import { extractSubSchemas } from '../../src/extract-sub-schema.js';
 
 describe('extract sub schema', function () {
   let schema;
@@ -16,7 +16,7 @@ describe('extract sub schema', function () {
 
   describe('plain schema', function () {
     it('return a new schema the one sub schema', function () {
-      const result = extractSchemas(schema, '/properties/name');
+      const result = extractSubSchemas(schema, '/properties/name');
       expect(result).to.eql({ minLength: 2 });
     });
 
@@ -25,7 +25,7 @@ describe('extract sub schema', function () {
 
   describe('non property pointer', function () {
     it('extracts that schema', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           additionalProperties: {
@@ -52,7 +52,7 @@ describe('extract sub schema', function () {
 
   describe('not keyword', function () {
     it('extracts the not schema', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           not: {
@@ -76,7 +76,7 @@ describe('extract sub schema', function () {
 
   describe('patternProperties', function () {
     it('includes the schema if allOf if matching the property name', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           patternProperties: {
@@ -108,7 +108,7 @@ describe('extract sub schema', function () {
 
   describe('additionalProperties', function () {
     it('does not include the schema if matching properties or patternProperties', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           patternProperties: {
@@ -135,7 +135,7 @@ describe('extract sub schema', function () {
     });
 
     it('does include the schema if not matching properties or patternProperties', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           patternProperties: {
@@ -161,7 +161,7 @@ describe('extract sub schema', function () {
     });
 
     it('does include the schema if not matching properties or patternProperties', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           patternProperties: {
@@ -181,7 +181,7 @@ describe('extract sub schema', function () {
 
   describe('dependentSchemas', function () {
     it('considers ', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           dependentSchemas: {
@@ -213,7 +213,7 @@ describe('extract sub schema', function () {
 
   describe('schemas in arrays', function () {
     it('extracts allOf', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           allOf: [
@@ -239,7 +239,7 @@ describe('extract sub schema', function () {
     });
 
     it('extracts anyOf', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           anyOf: [
@@ -265,7 +265,7 @@ describe('extract sub schema', function () {
     });
 
     it('extracts oneOf', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           oneOf: [
@@ -291,7 +291,7 @@ describe('extract sub schema', function () {
     });
 
     it('extracts deeply nested ones', function () {
-      const result = extractSchemas(
+      const result = extractSubSchemas(
         {
           properties: schema.properties,
           allOf: [
