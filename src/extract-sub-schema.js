@@ -4,15 +4,23 @@ import { isPlainObject, attempt, merge, reduce } from 'lodash-es';
 
 const isNotEmptyObject = o => isPlainObject(o) && Object.keys(o).length > 0;
 const isRestrictingSchema = s => isNotEmptyObject(s) || s === false;
-const has = (o, name) => Reflect.has(o, name);
+const has = Reflect.has;
 const isArray = Array.isArray;
 
+/**
+ * Extracts all schemas that applies to a particular point in the schema
+ * Iterates over allOf, anyOf and oneOf and construct a new schema that contains all schemas for the given jsonPointer
+ * @param {*} schema
+ * @param {*} jsonPointer
+ * @param {*} options
+ * @returns
+ */
 function extractSchemas(schema, jsonPointer, options) {
   options = options || {};
   const tokens = pointer.parse(jsonPointer);
   const lastToken = tokens[tokens.length - 1];
-  const newSchema = {};
-  const hasPatternProperty = false;
+  let newSchema = {};
+  let hasPatternProperty = false;
 
   attempt(function () {
     const subSchema = pointer.get(schema, jsonPointer);
@@ -69,10 +77,12 @@ function extractSchemas(schema, jsonPointer, options) {
     );
   }
 
-  if (has(schema, 'dependencies') && isArray(options.presentKeys)) {
+  // finds all dependent schemas that are applies if keys are present in the instance
+  // FIXME need to probably have the full instance, as we need to walk the same tree to find what keys are actually present
+  if (has(schema, 'dependentSchemas') && isArray(options.presentKeys)) {
     const dependencySchemas = options.presentKeys.reduce(function (all, key) {
-      if (has(schema.dependencies, key)) {
-        all.push(extractSchemas(schema.dependencies[key], jsonPointer));
+      if (has(schema.dependencySchemas, key)) {
+        all.push(extractSchemas(schema.dependencySchemas[key], jsonPointer));
       }
       return all;
     }, []);

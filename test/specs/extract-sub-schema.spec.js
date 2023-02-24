@@ -179,12 +179,12 @@ describe('extract sub schema', function () {
     });
   });
 
-  describe('dependencies', function () {
+  describe('dependentSchemas', function () {
     it('considers ', function () {
       const result = extractSchemas(
         {
           properties: schema.properties,
-          dependencies: {
+          dependentSchemas: {
             other: {
               properties: {
                 name: {
