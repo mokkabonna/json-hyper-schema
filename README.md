@@ -2,8 +2,6 @@
 
 > A javascript implementation of json hyper schema.
 
-WIP
-
 This is currently under heavy development, expect the API to change. The tests are probably the best description of the functionality so far. So here is the spec so far:
 
 ```
@@ -71,16 +69,6 @@ resolver
 3 pending
 
 ```
-
-## Roadmap
-
-- [x] Get template data from instance
-- [x] Get default values for user input
-- [x] Provide user input and template uri
-- [ ] Support base keyword
-- [ ] Support contextPointer
-- [x] Relative json pointer util
-- [x] Extract subschema util
 
 ## Utils
 
