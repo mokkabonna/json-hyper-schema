@@ -9,7 +9,7 @@
   "scripts": {
     "eslint": "eslint src test",
     "test": "npm run eslint && c8 --reporter=html --reporter=lcov --reporter=text mocha test/specs/**",
-    "develop": "nodemon --exec 'mocha test/specs/** || exit 1'"
+    "develop": "nodemon --exec 'c8 --reporter=lcov mocha test/specs/** || exit 1'"
   },
   "repository": {
     "type": "git",
