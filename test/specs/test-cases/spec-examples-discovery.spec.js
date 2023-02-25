@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { discoverLinks } from '../../../src/discovery.js';
 import { readFileSync } from 'node:fs';
 
-describe.only('Link discovery based on examples in the JSON hyper schema spec', () => {
+describe('Link discovery based on examples in the JSON hyper schema spec', () => {
   const suites = JSON.parse(
     readFileSync('test/test-cases/spec-examples-discovery.json', 'utf8')
   );

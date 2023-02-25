@@ -1,10 +1,10 @@
 // convert to imports
 import pointer from 'json-pointer';
-import { isPlainObject, attempt, merge, reduce } from 'lodash-es';
+import { isPlainObject, attempt, merge, reduce, isObject } from 'lodash-es';
 
 const isNotEmptyObject = o => isPlainObject(o) && Object.keys(o).length > 0;
 const isRestrictingSchema = s => isNotEmptyObject(s) || s === false;
-const has = Reflect.has;
+const has = (obj, prop) => isObject(obj) && Reflect.has(obj, prop);
 const isArray = Array.isArray;
 
 /**
@@ -81,8 +81,8 @@ function extractSubSchemas(schema, jsonPointer, options) {
   // FIXME need to probably have the full instance, as we need to walk the same tree to find what keys are actually present
   if (has(schema, 'dependentSchemas') && isArray(options.presentKeys)) {
     const dependencySchemas = options.presentKeys.reduce(function (all, key) {
-      if (has(schema.dependencySchemas, key)) {
-        all.push(extractSubSchemas(schema.dependencySchemas[key], jsonPointer));
+      if (has(schema.dependentSchemas, key)) {
+        all.push(extractSubSchemas(schema.dependentSchemas[key], jsonPointer));
       }
       return all;
     }, []);
