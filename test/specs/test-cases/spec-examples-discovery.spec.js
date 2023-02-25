@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { discoverLinks } from '../../../src/discovery.js';
 import { readFileSync } from 'node:fs';
 
-describe.only('discoverLinks examples in the json hyper schema spec', () => {
+describe.only('Link discovery based on examples in the JSON hyper schema spec', () => {
   const suites = JSON.parse(
     readFileSync('test/test-cases/spec-examples-discovery.json', 'utf8')
   );
@@ -16,11 +16,13 @@ describe.only('discoverLinks examples in the json hyper schema spec', () => {
           instanceUri: test.instanceUri,
         });
 
-        expect(result.resolvedLinks.length).to.equal(test.resolvedLinks.length);
+        expect(result.discoveredLinks.length).to.equal(
+          test.discoveredLinks.length
+        );
 
-        for (const [index, link] of Object.entries(result.resolvedLinks)) {
+        for (const [index, link] of Object.entries(result.discoveredLinks)) {
           expect(link).to.deep.equal(
-            test.resolvedLinks[index],
+            test.discoveredLinks[index],
             'linkIndex ' + index
           );
         }

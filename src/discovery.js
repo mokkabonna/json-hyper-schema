@@ -1,20 +1,9 @@
-import uriTemplates from 'uri-templates';
-import URI from 'uri-js';
 import { extractSubSchemas } from './extract-sub-schema.js';
 import { getTemplateVariableInfoFromInstance } from './get-default-input-values.js';
 
 const normalizeArray = arr => (Array.isArray(arr) ? arr : [arr]);
 
 function createLinks(ldo, instance, instanceUri, instancePointer, basesSoFar) {
-  //FIXME
-  // const resolvedUri = basesSoFar.reduce(
-  //   (base, uri) => URI.resolve(base, uri),
-  //   instanceUri
-  // );
-
-  // const templatedUri = uriTemplates(ldo.href).fillFromObject(instance);
-  // const targetUri = URI.resolve(resolvedUri, templatedUri);
-
   const defaultInputValues = getTemplateVariableInfoFromInstance(ldo, instance);
   const relNormalized = normalizeArray(ldo.rel);
 
@@ -35,17 +24,17 @@ function flattenSchemas(rootSchema) {
   return [rootSchema];
 }
 
-function resolveRecursive(
+function discoverRecursive(
   schema,
   instance,
   instanceUri,
-  instancePointer,
+  instancePointer = '',
   basesSoFar = []
 ) {
   const subSchema = extractSubSchemas(schema, instancePointer);
   const schemas = flattenSchemas(subSchema);
 
-  const resolvedLinks = schemas.flatMap(schema => {
+  const discoveredLinks = schemas.flatMap(schema => {
     return (schema.links ?? []).flatMap(ldo => {
       let bases = basesSoFar;
       if (schema.base) {
@@ -55,15 +44,15 @@ function resolveRecursive(
     });
   });
 
-  return resolvedLinks;
+  return discoveredLinks;
 }
 
 function discoverLinks({ schema, instance, instanceUri }) {
   //FIXME get all links from schema and subschemas, get only root for now
-  const resolvedLinks = resolveRecursive(schema, instance, instanceUri, '');
+  const discoveredLinks = discoverRecursive(schema, instance, instanceUri);
 
   return {
-    resolvedLinks,
+    discoveredLinks,
   };
 }
 

@@ -23,7 +23,7 @@
           ]
         },
         "instanceData": {},
-        "resolvedLinks": [
+        "discoveredLinks": [
           {
             "contextUri": "https://example.com/api",
             "attachmentPointer": "",
@@ -76,7 +76,7 @@
           "id": 123,
           "data": "some data"
         },
-        "resolvedLinks": [
+        "discoveredLinks": [
           {
             "attachmentPointer": "",
             "contextUri": "https://example.com/api/things/123",
@@ -125,7 +125,7 @@
           ]
         },
         "instanceData": {},
-        "resolvedLinks": [
+        "discoveredLinks": [
           {
             "contextUri": "https://example.com/api",
             "attachmentPointer": "",
@@ -153,6 +153,97 @@
                 "isRequired": true,
                 "acceptsUserInput": true,
                 "hasValueFromInstance": false
+              }
+            }
+          }
+        ]
+      },
+      {
+        "title": "Submitting a payload and accepting URI input Example in 9.3",
+        "description": "",
+        "instanceUri": "https://example.com/api/stuff",
+        "schema": {
+          "$id": "https://schema.example.com/interesting-stuff",
+          "$schema": "https://json-schema.org/draft/2019-09/hyper-schema",
+          "required": ["stuffWorthEmailingAbout", "email", "title"],
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "stuffWorthEmailingAbout": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "cc": false
+          },
+          "links": [
+            {
+              "rel": "author",
+              "href": "mailto:{email}?subject={title}{&cc}",
+              "templateRequired": ["email"],
+              "hrefSchema": {
+                "required": ["title"],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "cc": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "email": false
+                }
+              },
+              "submissionMediaType": "multipart/alternative; boundary=ab2",
+              "submissionSchema": {
+                "type": "array",
+                "items": [
+                  {
+                    "type": "string",
+                    "contentMediaType": "text/plain; charset=utf8"
+                  },
+                  {
+                    "type": "string",
+                    "contentMediaType": "text/html"
+                  }
+                ],
+                "minItems": 2
+              }
+            }
+          ]
+        },
+        "instanceData": {
+          "title": "The Awesome Thing",
+          "stuffWorthEmailingAbout": "Lots of text here...",
+          "email": "someone@example.com"
+        },
+        "discoveredLinks": [
+          {
+            "contextUri": "https://example.com/api/stuff",
+            "attachmentPointer": "",
+            "contextPointer": "",
+            "rel": "author",
+            "hrefInputTemplates": ["mailto:{email}?subject={title}{&cc}"],
+            "templateVariableInfo": {
+              "email": {
+                "isRequired": true,
+                "acceptsUserInput": false,
+                "hasValueFromInstance": true,
+                "value": "someone@example.com"
+              },
+              "cc": {
+                "isRequired": false,
+                "acceptsUserInput": true,
+                "hasValueFromInstance": false
+              },
+              "title": {
+                "isRequired": true,
+                "acceptsUserInput": true,
+                "hasValueFromInstance": true,
+                "value": "The Awesome Thing"
               }
             }
           }
