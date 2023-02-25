@@ -1,19 +1,8 @@
-# json-hyper-schema [![Build Status](https://travis-ci.org/mokkabonna/json-hyper-schema.svg?branch=master)](https://travis-ci.org/mokkabonna/json-hyper-schema) [![Coverage Status](https://coveralls.io/repos/github/mokkabonna/json-hyper-schema/badge.svg?branch=master)](https://coveralls.io/github/mokkabonna/json-hyper-schema?branch=master)
-
+# json-hyper-schema ![example workflow](https://github.com/mokkabonna/json-hyper-schema/actions/workflows/test.yml/badge.svg) [![codecov](https://codecov.io/gh/mokkabonna/json-hyper-schema/branch/master/graph/badge.svg?token=3MhxT65dCW)](https://codecov.io/gh/mokkabonna/json-hyper-schema)
 
 > A javascript implementation of json hyper schema.
 
 WIP
-
-
-Steps:
-
-1. Discover all links from LDO and find applicabble and valid links
-Most links can probably be valid AFAIK if they are provided with additional input from say the user. However some links might have restricted user input and so if they are not templateable from the instance then they will not be valid.
-
-The tricky part IMO is to find the right context for the link. Is it the instance, then the part of the json referenced with a json pointer?
-
-
 
 This is currently under heavy development, expect the API to change. The tests are probably the best description of the functionality so far. So here is the spec so far:
 
@@ -83,7 +72,6 @@ resolver
 
 ```
 
-
 ## Roadmap
 
 - [x] Get template data from instance
@@ -93,7 +81,6 @@ resolver
 - [ ] Support contextPointer
 - [x] Relative json pointer util
 - [x] Extract subschema util
-
 
 ## Utils
 
