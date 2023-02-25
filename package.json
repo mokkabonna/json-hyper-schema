@@ -8,9 +8,8 @@
   },
   "scripts": {
     "eslint": "eslint src test",
-    "test": "npm run eslint && nyc --reporter=html --reporter=text mocha test/specs",
-    "develop": "nodemon --exec 'mocha test/specs/** || exit 1'",
-    "coverage": "nyc report --reporter=text-lcov | coveralls"
+    "test": "npm run eslint && nyc --reporter=html --reporter=lcov --reporter=text mocha test/specs",
+    "develop": "nodemon --exec 'mocha test/specs/** || exit 1'"
   },
   "repository": {
     "type": "git",
@@ -39,7 +38,6 @@
   },
   "devDependencies": {
     "chai": "^4.3.7",
-    "coveralls": "^3.1.1",
     "eslint": "^8.34.0",
     "eslint-config": "^0.3.0",
     "eslint-config-standard": "^10.2.1",
