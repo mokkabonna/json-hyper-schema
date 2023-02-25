@@ -5,6 +5,12 @@ import { getTemplateData } from './get-template-data.js';
 const isFalse = s => s === false;
 const has = Reflect.has;
 
+const isRequiredTemplateVariable = (ldo, name) => {
+  if (ldo.templateRequired?.includes(name)) return true;
+  if (ldo.hrefSchema?.required?.includes(name)) return true;
+  return false;
+};
+
 /**
  * Checks all schemas if any is defined as false, then user input is not allowed
  */
@@ -25,8 +31,6 @@ function getTemplateVariableInfoFromInstance(ldo, instance) {
     instance,
   });
 
-  const isRequired = name => (ldo.templateRequired ?? []).includes(name);
-
   // check if all template variables does not accept user input
   if (ldo.hrefSchema === false || !has(ldo, 'hrefSchema')) {
     return Object.fromEntries(
@@ -38,8 +42,8 @@ function getTemplateVariableInfoFromInstance(ldo, instance) {
         return [
           name,
           {
-            value,
-            isRequired: isRequired(name),
+            ...(Reflect.has(templateData, name) ? { value } : {}),
+            isRequired: isRequiredTemplateVariable(ldo, name),
             acceptsUserInput: false,
             hasValueFromInstance: has(templateData, name),
           },
@@ -60,8 +64,8 @@ function getTemplateVariableInfoFromInstance(ldo, instance) {
         name,
         {
           //fixme consider rename value to more descriptive like valueFromInstance
-          value,
-          isRequired: isRequired(name),
+          ...(Reflect.has(templateData, name) ? { value } : {}),
+          isRequired: isRequiredTemplateVariable(ldo, name),
           acceptsUserInput: schemaAcceptsUserInput(subSchema),
           hasValueFromInstance: has(templateData, name),
         },

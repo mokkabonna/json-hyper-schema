@@ -14,7 +14,6 @@ describe('getTemplateVariableInfoFromInstance', function () {
 
     expect(result).to.eql({
       id: {
-        value: undefined,
         isRequired: true,
         hasValueFromInstance: false,
         acceptsUserInput: false,
