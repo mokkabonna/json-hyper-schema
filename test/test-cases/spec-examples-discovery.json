@@ -1,0 +1,163 @@
+[
+  {
+    "title": "Spec examples",
+    "description": "This suite tests the examples in the spec for correct link discovery. It does not test templating and resolution of URIs. It is not intended to be a comprehensive test suite. Some examples does not explicitly specify the instance data, but it is added to the test to test the link generation. Some examples does not specify the link configuration or the linstance data, but they describe the result in the text.",
+    "source": "https://json-schema.org/draft/2019-09/json-schema-hypermedia.html#rfc.section.9",
+    "tests": [
+      {
+        "title": "Entry point links, no templates. Example in 9.1",
+        "instanceUri": "https://example.com/api",
+        "schema": {
+          "$id": "https://schema.example.com/entry",
+          "$schema": "https://json-schema.org/draft/2019-09/hyper-schema",
+          "base": "https://example.com/api/",
+          "links": [
+            {
+              "rel": "self",
+              "href": "../api"
+            },
+            {
+              "rel": "about",
+              "href": "docs"
+            }
+          ]
+        },
+        "instanceData": {},
+        "resolvedLinks": [
+          {
+            "contextUri": "https://example.com/api",
+            "attachmentPointer": "",
+            "contextPointer": "",
+            "rel": "self",
+            "hrefInputTemplates": ["../api", "https://example.com/api/"],
+            "templateVariableInfo": {}
+          },
+          {
+            "contextUri": "https://example.com/api",
+            "attachmentPointer": "",
+            "contextPointer": "",
+            "rel": "about",
+            "hrefInputTemplates": ["docs", "https://example.com/api/"],
+            "templateVariableInfo": {}
+          }
+        ]
+      },
+      {
+        "title": "Individually Identified Resources Example in 9.2",
+        "description": "Instancedata not specified for this example but added to test. Neither is generated link config.",
+        "instanceUri": "https://example.com/api/things/123",
+        "schema": {
+          "$id": "https://schema.example.com/thing",
+          "$schema": "https://json-schema.org/draft/2019-09/hyper-schema",
+          "base": "https://example.com/api/",
+          "type": "object",
+          "required": ["data"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" },
+            "data": true
+          },
+          "links": [
+            {
+              "rel": "self",
+              "href": "things/{id}",
+              "templateRequired": ["id"],
+              "targetSchema": { "$ref": "#" }
+            }
+          ],
+          "$defs": {
+            "id": {
+              "type": "integer",
+              "minimum": 1,
+              "readOnly": true
+            }
+          }
+        },
+        "instanceData": {
+          "id": 123,
+          "data": "some data"
+        },
+        "resolvedLinks": [
+          {
+            "attachmentPointer": "",
+            "contextUri": "https://example.com/api/things/123",
+            "contextPointer": "",
+            "rel": "self",
+            "hrefInputTemplates": ["things/{id}", "https://example.com/api/"],
+            "templateVariableInfo": {
+              "id": {
+                "value": 123,
+                "isRequired": true,
+                "acceptsUserInput": false,
+                "hasValueFromInstance": true
+              }
+            }
+          }
+        ]
+      },
+      {
+        "title": "Updated entry point schema with thing Example in 9.2",
+        "description": "Adds link to a thing that can not be directly used, but require input of an id. Ref to thing id is made inline.",
+        "instanceUri": "https://example.com/api",
+        "schema": {
+          "$id": "https://schema.example.com/entry",
+          "$schema": "https://json-schema.org/draft/2019-09/hyper-schema",
+          "base": "https://example.com/api/",
+          "links": [
+            {
+              "rel": "self",
+              "href": "../api"
+            },
+            {
+              "rel": "about",
+              "href": "docs"
+            },
+            {
+              "rel": "tag:rel.example.com,2017:thing",
+              "href": "things/{id}",
+              "hrefSchema": {
+                "required": ["id"],
+                "properties": {
+                  "id": { "type": "integer", "minimum": 1, "readOnly": true }
+                }
+              },
+              "targetSchema": { "$ref": "thing#" }
+            }
+          ]
+        },
+        "instanceData": {},
+        "resolvedLinks": [
+          {
+            "contextUri": "https://example.com/api",
+            "attachmentPointer": "",
+            "contextPointer": "",
+            "rel": "self",
+            "hrefInputTemplates": ["../api", "https://example.com/api/"],
+            "templateVariableInfo": {}
+          },
+          {
+            "contextUri": "https://example.com/api",
+            "attachmentPointer": "",
+            "contextPointer": "",
+            "rel": "about",
+            "hrefInputTemplates": ["docs", "https://example.com/api/"],
+            "templateVariableInfo": {}
+          },
+          {
+            "contextUri": "https://example.com/api",
+            "attachmentPointer": "",
+            "contextPointer": "",
+            "rel": "tag:rel.example.com,2017:thing",
+            "hrefInputTemplates": ["things/{id}", "https://example.com/api/"],
+            "templateVariableInfo": {
+              "id": {
+                "isRequired": true,
+                "acceptsUserInput": true,
+                "hasValueFromInstance": false
+              }
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
